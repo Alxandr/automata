@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import { connect } from 'react-redux';
-import Title from 'grommet/components/Title';
 
 class Versions extends Component {
   constructor(props, context) {
@@ -16,12 +15,12 @@ class Versions extends Component {
   }
 
   render() {
-    return (<Title>Versions</Title>);
+    return (<h1>Versions</h1>);
   }
 }
 
 Versions.propTypes = {
   dispatch: PropTypes.func.isRequired
-}
+};
 
 export default connect()(Versions);

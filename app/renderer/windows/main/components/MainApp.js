@@ -1,15 +1,33 @@
 import React from 'react';
-import App from 'grommet/components/App';
-import Split from 'grommet/components/Split';
-import Title from 'grommet/components/Title';
 import { Route, Switch } from 'react-router';
+import { styled } from 'styletron-react';
 import NavSidebar from './NavSidebar';
 import Versions from './Versions';
+import { ColumnLayout, Column } from '../../common/components/layout';
 
-const Home = () => (<Title>Home</Title>);
-const NoMatch = () => (<Title>No match</Title>);
+const RootLayout = styled(ColumnLayout, {
+  height: '100%'
+});
+
+const Home = () => (<h1>Home</h1>);
+const NoMatch = () => (<h1>No match</h1>);
 
 const MainApp = () => (
+  <RootLayout>
+    <Column fixed width="200px">
+      <NavSidebar />
+    </Column>
+    <Column flex>
+      <Switch>
+        <Route path="/index" component={Home} />
+        <Route path="/versions" component={Versions} />
+        <Route component={NoMatch} />
+      </Switch>
+    </Column>
+  </RootLayout>
+);
+
+/*const MainApp = () => (
   <App centered={false}>
     <Split fixed={true} flex="right" showOnResponsive="both">
       <NavSidebar />
@@ -20,6 +38,6 @@ const MainApp = () => (
       </Switch>
     </Split>
   </App>
-);
+);*/
 
 export default MainApp;

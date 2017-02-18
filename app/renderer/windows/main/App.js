@@ -1,13 +1,12 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { IntlProvider, addLocaleData } from 'react-intl';
-import en from 'react-intl/locale-data/en';
-import { getCurrentLocale, getLocaleData } from 'grommet/utils/Locale';
+import Styletron from 'styletron-client';
+import { StyletronProvider } from 'styletron-react';
 import { store } from '../../store';
 import Router from '../../router/Router';
 import MainApp from './components/MainApp';
 
-const locale = getCurrentLocale();
+/*const locale = getCurrentLocale();
 addLocaleData(en);
 
 let messages;
@@ -17,9 +16,10 @@ try {
   messages = require('../../../i18n/en-US').default;
 }
 
-const localeData = getLocaleData(messages, locale);
+const localeData = getLocaleData(messages, locale);*/
 
-const App = () => (
+// TODO: Locale
+/*const App = () => (
   <Provider store={store}>
     <IntlProvider locale={localeData.locale} messages={localeData.messages}>
       <Router>
@@ -27,6 +27,18 @@ const App = () => (
       </Router>
     </IntlProvider>
   </Provider>
+);*/
+
+const styletron = new Styletron();
+
+const App = () => (
+  <StyletronProvider styletron={styletron}>
+    <Provider store={store}>
+      <Router>
+        <MainApp />
+      </Router>
+    </Provider>
+  </StyletronProvider>
 );
 
 export default App;

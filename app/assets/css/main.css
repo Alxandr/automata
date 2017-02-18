@@ -1,0 +1,247 @@
+html,
+body,
+#root {
+  padding: 0;
+  margin: 0;
+  height: 100%;
+}
+html,
+body,
+* {
+  box-sizing: border-box;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+nav,
+section {
+  display: block;
+}
+audio,
+canvas,
+video {
+  display: inline-block;
+}
+audio:not([controls]) {
+  display: none;
+}
+a:hover,
+a:active,
+.tile:active {
+  outline: 0;
+}
+sub,
+sup {
+  position: relative;
+  font-size: 75%;
+  line-height: 0;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+  border: 0;
+}
+#map_canvas img,
+.google-maps img {
+  max-width: none;
+}
+button,
+input,
+select,
+textarea {
+  margin: 0;
+  font-size: 100%;
+  vertical-align: middle;
+}
+button,
+input {
+  line-height: normal;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  padding: 0;
+  border: 0;
+}
+button,
+html input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button;
+  cursor: pointer;
+}
+label,
+select,
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"],
+input[type="radio"],
+input[type="checkbox"] {
+  cursor: pointer;
+}
+input[type="search"] {
+  box-sizing: content-box;
+  appearance: textfield;
+}
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+textarea {
+  overflow: auto;
+  vertical-align: top;
+}
+input[type=text]::-ms-clear,
+input[type=email]::-ms-clear,
+input[type=url]::-ms-clear,
+input[type=tel]::-ms-clear,
+input[type=number]::-ms-clear,
+input[type=time]::-ms-clear {
+  display: none;
+}
+input[type=password]::-ms-reveal {
+  display: none;
+}
+* {
+  border-collapse: collapse;
+}
+a {
+  text-decoration: none;
+}
+@media print {
+  a,
+  a:visited {
+    text-decoration: underline;
+  }
+  a[href]:after {
+    content: " (" attr(href) ")";
+  }
+  abbr[title]:after {
+    content: " (" attr(title) ")";
+  }
+  .ir a:after,
+  a[href^="javascript:"]:after,
+  a[href^="#"]:after {
+    content: "";
+  }
+  pre,
+  blockquote {
+    border: 1px solid #999;
+    page-break-inside: avoid;
+  }
+  thead {
+    display: table-header-group;
+  }
+  tr,
+  img {
+    page-break-inside: avoid;
+  }
+  img {
+    max-width: 100%;
+  }
+  p,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+  h2,
+  h3 {
+    page-break-after: avoid;
+  }
+}
+@font-face {
+  font-family: "PT Serif Caption";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Cambria"), local("PT Serif Caption"), local("PTSerif-Caption"), url(https://themes.googleusercontent.com/static/fonts/ptserifcaption/v6/7xkFOeTxxO1GMC1suOUYWWhBabBbEjGd1iRmpyoZukE.woff) format('woff');
+}
+@font-face {
+  font-family: "Open Sans Light";
+  font-style: normal;
+  font-weight: 300;
+  src: local("Segoe UI Light"), local("Open Sans Light"), local("OpenSans-Light"), url(https://themes.googleusercontent.com/static/fonts/opensans/v8/DXI1ORHCpsQm3Vp6mXoaTZ1r3JsPcQLi8jytr04NNhU.woff) format('woff');
+}
+@font-face {
+  font-family: "Open Sans";
+  font-style: normal;
+  font-weight: 400;
+  src: local("Segoe UI"), local("Open Sans"), local("OpenSans"), url(https://themes.googleusercontent.com/static/fonts/opensans/v8/K88pR3goAWT7BTt32Z01mz8E0i7KZn-EPnyo3HZu7kw.woff) format('woff');
+}
+@font-face {
+  font-family: "Open Sans Bold";
+  font-style: normal;
+  font-weight: 700;
+  src: local("Segoe UI Bold"), local("Open Sans Bold"), local("OpenSans-Bold"), url(https://themes.googleusercontent.com/static/fonts/opensans/v8/k3k702ZOKiLJc3WVjuplzJ1r3JsPcQLi8jytr04NNhU.woff) format('woff');
+}
+html {
+  font-size: 100%;
+}
+body {
+  font-family: "Segoe UI", "Open Sans", sans-serif, serif;
+  font-size: 0.875rem;
+  line-height: 1.1;
+  font-weight: 400;
+  font-style: normal;
+}
+
+h1 {
+  font: 400 2.25rem/1.1 "Segoe UI", "Open Sans", sans-serif, serif;
+}
+h2 {
+  font: 500 1.875rem/1.1 "Segoe UI", "Open Sans", sans-serif, serif;
+}
+h3 {
+  font: 500 1.5rem/1.1 "Segoe UI", "Open Sans", sans-serif, serif;
+}
+h4 {
+  font: 500 1.125rem/1.1 "Segoe UI", "Open Sans", sans-serif, serif;
+}
+h5 {
+  font: 500 0.875rem/1.1 "Segoe UI", "Open Sans", sans-serif, serif;
+}
+h6 {
+  font: 500 0.75rem/1.1 "Segoe UI", "Open Sans", sans-serif, serif;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: .625rem 0;
+}
+h1 small,
+h2 small,
+h3 small,
+h4 small,
+h5 small,
+h6 small {
+  font-weight: 400;
+  font-size: .7em;
+  line-height: 1;
+  color: #777;
+}
+
+@font-face {
+	font-family: 'metro';
+	src:url('../fonts/metro.eot');
+	src:url('../fonts/metro.eot') format('embedded-opentype'),
+	url('../fonts/metro.woff') format('woff'),
+	url('../fonts/metro.ttf') format('truetype'),
+	url('../fonts/metro.svg') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
