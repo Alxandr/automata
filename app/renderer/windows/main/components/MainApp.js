@@ -1,29 +1,83 @@
 import React from 'react';
 import { Route, Switch } from 'react-router';
-import { styled } from 'styletron-react';
+import { connect } from 'react-redux';
+import { createSelector } from 'reselect';
+import { createStyleSheet } from 'jss-theme-reactor';
+import { withProps ,setDisplayName } from 'recompose';
 import NavSidebar from './NavSidebar';
 import Versions from './Versions';
-import { ColumnLayout, Column } from '../../common/components/layout';
+import { withStyleSheet, withClasses } from '../../../styles/styled';
+import { forWindow, composeComponent } from '../../../utils';
+import { rendererId } from '../../../store';
+import { ColumnLayout, Column } from '../../../components/layout';
+import { ProgressLock } from '../../../components/Preloader';
 
-const RootLayout = styled(ColumnLayout, {
-  height: '100%'
-});
+const styleSheet = createStyleSheet('App', () => ({
+  app: {
+    height: '100%'
+  },
+
+  menu: {
+    width: '200px'
+  },
+
+  main: {
+    padding: '20px'
+  }
+}));
+
+const RootLayout =
+  composeComponent(
+    setDisplayName('RootLayout'),
+    withStyleSheet(styleSheet),
+    withClasses('app'),
+    ColumnLayout
+  );
+
+const MenuColumn =
+  composeComponent(
+    setDisplayName('MenuColumn'),
+    withStyleSheet(styleSheet),
+    withClasses('menu'),
+    withProps({ fixed: true }),
+    Column
+  );
+
+const MainColumn =
+  composeComponent(
+    setDisplayName('MainColumn'),
+    withStyleSheet(styleSheet),
+    withClasses('main'),
+    Column
+  );
 
 const Home = () => (<h1>Home</h1>);
 const NoMatch = () => (<h1>No match</h1>);
 
+const lockSelector = forWindow(rendererId, state => state.windowLock);
+const mapStateToProgressProps = createSelector(
+  lockSelector,
+  (locked) => ({ locked: locked })
+);
+const ConnectedProgressLock =
+  composeComponent(
+    connect(mapStateToProgressProps),
+    ProgressLock
+  );
+
 const MainApp = () => (
   <RootLayout>
-    <Column fixed width="200px">
+    <MenuColumn>
       <NavSidebar />
-    </Column>
-    <Column flex>
+    </MenuColumn>
+    <MainColumn>
       <Switch>
         <Route path="/index" component={Home} />
         <Route path="/versions" component={Versions} />
         <Route component={NoMatch} />
       </Switch>
-    </Column>
+    </MainColumn>
+    <ConnectedProgressLock scale={4} />
   </RootLayout>
 );
 

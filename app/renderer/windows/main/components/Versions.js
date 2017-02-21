@@ -1,26 +1,55 @@
-import React, { Component, PropTypes } from 'react';
+import React, { PropTypes } from 'react';
+import { setDisplayName } from 'recompose';
 import { connect } from 'react-redux';
+import { createStructuredSelector } from 'reselect';
+import Page from './Page';
+import Icon from '../../../components/Icon';
+import Button from '../../../components/Button';
+import Table from '../../../components/Table';
+import { composeComponent, onMounted } from '../../../utils';
+import { fetchLocalVersions, download, localVersionsSelector } from '../../../../parts/versions';
 
-class Versions extends Component {
-  constructor(props, context) {
-    super(props, context);
+const mapStateToProps = createStructuredSelector({
+  local: localVersionsSelector
+});
 
-    this.dispatch = props.dispatch;
-  }
+const mapDispatchToProps = { fetchLocal: fetchLocalVersions, download };
 
-  componentWillMount() {
-    this.dispatch({
-      type: 'FETCH_FACTORIO_VERSIONS'
-    });
-  }
+const Versions =
+  composeComponent(
+    setDisplayName('Versions'),
+    connect(mapStateToProps, mapDispatchToProps),
+    onMounted(({ fetchLocal }) => fetchLocal()),
+    ({ local, download }) => {
+      const display = local.length > 0 ? (
+        <ShowVersions versions={local} />
+      ) : (
+        'No factorio versions installed.'
+      );
+      return (
+        <Page name="Factorio versions">
+          <Button primary onClick={download}><Icon type="plus" /> Download</Button>
+          <Page.Hr />
+          {display}
+        </Page>
+      );
+    }
+  );
 
-  render() {
-    return (<h1>Versions</h1>);
-  }
-}
-
-Versions.propTypes = {
-  dispatch: PropTypes.func.isRequired
+const ShowVersions = ({ versions }) => {
+  return (
+    <Table border bordered>
+      <Table.Header>
+        <Table.Row>
+          <Table.HeaderCell />
+          <Table.HeaderCell>Version</Table.HeaderCell>
+        </Table.Row>
+      </Table.Header>
+    </Table>
+  );
+};
+ShowVersions.propTypes = {
+  versions: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
-export default connect()(Versions);
+export default Versions;

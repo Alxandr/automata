@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { applyMiddleware, createStore } from 'redux';
-import createLogger from 'redux-logger';
+import createNodeLogger from 'redux-node-logger';
 import createSagaMiddleware from 'redux-saga';
 import { reducer } from '../reducer';
 import { init } from '../renderer/router';
@@ -29,6 +29,8 @@ const getFromRenderers = store => next => {
   ipcMain.on('redux-action', (event, action) => {
     next(action);
   });
+
+  return action => next(action);
 };
 
 const forwardToRenderers = _store => next => {
@@ -42,9 +44,7 @@ const forwardToRenderers = _store => next => {
   return sendAll;
 };
 
-const logger = createLogger({
-  colors: {}
-});
+const logger = createNodeLogger();
 export const store = createStore(
   reducer,
   initialState,

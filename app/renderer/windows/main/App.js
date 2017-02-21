@@ -1,10 +1,9 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import Styletron from 'styletron-client';
-import { StyletronProvider } from 'styletron-react';
 import { store } from '../../store';
 import Router from '../../router/Router';
 import MainApp from './components/MainApp';
+import ThemeProvider from '../../styles/ThemeProvider';
 
 /*const locale = getCurrentLocale();
 addLocaleData(en);
@@ -29,16 +28,14 @@ const localeData = getLocaleData(messages, locale);*/
   </Provider>
 );*/
 
-const styletron = new Styletron();
-
 const App = () => (
-  <StyletronProvider styletron={styletron}>
+  <ThemeProvider>
     <Provider store={store}>
       <Router>
         <MainApp />
       </Router>
     </Provider>
-  </StyletronProvider>
+  </ThemeProvider>
 );
 
 export default App;

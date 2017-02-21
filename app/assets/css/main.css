@@ -5,6 +5,9 @@ body,
   margin: 0;
   height: 100%;
 }
+::-webkit-scrollbar {
+  display: none;
+}
 html,
 body,
 * {
@@ -244,4 +247,26 @@ h6 small {
 	url('../fonts/metro.svg') format('svg');
 	font-weight: normal;
 	font-style: normal;
+}
+
+@keyframes ani-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(359deg);
+            transform: rotate(359deg);
+  }
+}
+
+@keyframes ani-pre-spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
 }

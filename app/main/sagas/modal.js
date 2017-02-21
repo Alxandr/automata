@@ -8,7 +8,7 @@ const nextId = (() => {
   return () => id++;
 })();
 
-export const modal = function*(parent, name, options = {}) {
+export const modal = function* modal(parent, name, options = {}) {
   if (typeof parent === 'number') {
     const wc = webContents.fromId(parent);
     parent = BrowserWindow.fromWebContents(wc);
@@ -44,14 +44,17 @@ export const modal = function*(parent, name, options = {}) {
 
   modal.showUrl(`${__dirname}/../../assets/html/modal.html`, { id, name });
 
-  const result = yield race({
-    success,
-    cancel,
-    closed
-  });
-
-  if (!modal.isDestroyed()) {
-    modal.destroy();
+  let result;
+  try {
+    result = yield race({
+      success,
+      cancel,
+      closed
+    });
+  } finally {
+    if (!modal.isDestroyed()) {
+      modal.destroy();
+    }
   }
 
   if (result.success) {
