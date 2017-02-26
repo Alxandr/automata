@@ -1,4 +1,4 @@
-import { CANCEL, EXIT, INIT, LOCK, UNLOCK } from './constants';
+import { CANCEL, EXIT, INIT, LOCK, SUBMIT, UNLOCK } from './constants';
 
 export const init = (module, path, id) => ({
   type: INIT,
@@ -22,4 +22,10 @@ export const unlock = (id) => ({
 
 export const cancel = () => ({
   type: CANCEL
+});
+
+export const submit = (form, data) => ({
+  type: SUBMIT,
+  payload: data,
+  meta: { form }
 });

@@ -1,6 +1,11 @@
-import { call, cancel, fork, join, race, take } from 'redux-saga/effects';
+import * as formActionCreators from 'redux-form';
+
+import { call, cancel, fork, join, put, race, take } from 'redux-saga/effects';
+
 import { CANCEL } from '@shared/window/constants';
+import mapValues from 'lodash.mapvalues';
 import runWindow from './runWindow';
+import { submitFilter } from '@shared/window/filters';
 
 const named = (name, fn) => {
   Object.defineProperty(fn, 'name', {
@@ -26,9 +31,41 @@ const modal = fn => named(`modal(${fn.name})`, function* (id) {
   return ['ok', result.result];
 });
 
-function* doLogin() {
+const addWindow = (fn) => named(`withWindow(${fn.name})`, (window, ...args) => {
+  const action = fn(...args);
+  return {
+    ...action,
+    meta: {
+      ...action.meta,
+      window
+    }
+  };
+});
+
+const {
+  stopSubmit
+} = mapValues(formActionCreators, addWindow);
+
+function* doLogin(id) {
   while (true) {
-    const { payload: { username, password } } = yield take('login/LOGIN');
+    const { payload: { username, password } } = yield take(submitFilter(id, 'login'));
+    const errors = {};
+    let hasError = false;
+    if (!username) {
+      errors['username'] = 'Username is required.';
+      hasError = true;
+    }
+
+    if (!password) {
+      errors['password'] = 'Password is required';
+      hasError = true;
+    }
+
+    if (hasError) {
+      yield put(stopSubmit(id, 'login', errors));
+      continue;
+    }
+
     // TODO: do login
   }
 }

@@ -1,17 +1,17 @@
 /* eslint-disable react/prop-types */
-import * as importedActions from 'redux-form/actions';
+import * as importedActions from 'redux-form/lib/actions';
 
 import { Component, PropTypes } from 'react';
 import { createEagerFactory, wrapDisplayName } from 'recompose';
 
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { createHelper } from './createHelper';
-import createIsValid from 'redux-form/selectors/isValid';
+import createHelper from './createHelper';
+import createIsValid from 'redux-form/lib/selectors/isValid';
 import { createSelector } from 'reselect';
 import { formStateSelector } from '@shared/window';
 import mapValues from 'lodash.mapvalues';
-import structure from 'redux-form/structures/plain';
+import structure from 'redux-form/lib/structure/plain';
 
 const { deepEqual, empty, getIn, fromJS } = structure;
 const isValid = createIsValid(structure);
@@ -72,6 +72,7 @@ const reduxSagaForm = createHelper(initialConfig => BaseComponent => {
   class Form extends Component {
     constructor(props, context) {
       super(props, context);
+      this.submit = this.submit.bind(this);
       this.getValues = this.getValues.bind(this);
       this.register = this.register.bind(this);
       this.unregister = this.unregister.bind(this);
@@ -126,6 +127,18 @@ const reduxSagaForm = createHelper(initialConfig => BaseComponent => {
           this.props.unregisterField(name, false);
         }
       }
+    }
+
+    submit(evt) {
+      evt.preventDefault();
+      this.props.startSubmit();
+      this.props.dispatch({
+        type: '@form/SUBMIT',
+        payload: this.getValues(),
+        meta: {
+          form: this.props.form
+        }
+      });
     }
 
     render() {
@@ -353,6 +366,7 @@ const reduxSagaForm = createHelper(initialConfig => BaseComponent => {
   };
 
   const ConnectedForm = connect(mapStateToProps, mapDispatchToProps)(Form);
+  ConnectedForm.defaultProps = config;
   const connectedFormFactory = createEagerFactory(ConnectedForm);
 
   return class SagaForm extends Component {

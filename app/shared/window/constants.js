@@ -5,3 +5,4 @@ export const UNLOCK = '@window/UNLOCK';
 
 // used by sagas only
 export const CANCEL = '@window/CANCEL';
+export const SUBMIT = '@form/SUBMIT';

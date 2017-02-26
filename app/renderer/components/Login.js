@@ -1,13 +1,13 @@
 import React, { PropTypes } from 'react';
+import { composeComponent, reduxSagaForm } from '../utils';
+
+import Button from './Button';
+import Input from './Input';
+import { cancel } from '@shared/window';
+import { connect } from 'react-redux';
 import { createStyleSheet } from 'jss-theme-reactor';
 import { setDisplayName } from 'recompose';
-import { connect } from 'react-redux';
-import { reduxForm } from 'redux-form';
-import { cancel, formStateSelector } from '@shared/window';
-import Input from './Input';
-import Button from './Button';
 import { withStyleSheet } from '../styles/styled';
-import { composeComponent } from '../utils';
 
 const styleSheet = createStyleSheet('Login', ({
   white
@@ -40,9 +40,8 @@ const Login =
     setDisplayName('Login'),
     withStyleSheet(styleSheet),
     connect(null, mapDispatchToProps),
-    reduxForm({
-      form: 'login',
-      getFormState: formStateSelector
+    reduxSagaForm({
+      form: 'login'
     }),
     ({ classes, cancel, handleSubmit }) => (
       <div className={classes.login}>
