@@ -1,12 +1,11 @@
 {
   "name": "automata",
-  "productName": "Automata",
   "version": "0.1.0",
   "description": "Factorio Mod Manager",
   "repository": "https+git://github.com/Alxandr/automata.git",
   "author": "Alxandr",
   "license": "MIT",
-  "main": "main/index.js",
+  "private": true,
   "devDependencies": {
     "babel-cli": "^6.23.0",
     "babel-eslint": "^7.1.1",
@@ -24,14 +23,6 @@
     "eslint-plugin-react": "^6.9.0",
     "simple-scripts": "^0.1.1"
   },
-  "build": {
-    "appId": "me.alxandr.automata",
-    "category": "",
-    "compression": "store",
-    "mac": {
-      "category": "public.app-category.utilities"
-    }
-  },
   "directories": {
     "app": "./dist/",
     "output": "./release"
@@ -42,7 +33,7 @@
   },
   "simpleScripts": {
     "dev": {
-      "command": "electron -r babel-register -r babel-polyfill ./app/main",
+      "command": "electron -r babel-register -r babel-polyfill ./app",
       "env": {
         "HOT": "1",
         "NODE_ENV": "development"

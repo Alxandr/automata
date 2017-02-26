@@ -29,5 +29,5 @@ export const getVersions = async () => {
     return 'NEED_LOGIN';
   }
 
-  throw new Error(`TODO: implement`);
+  throw new Error('TODO: implement');
 };

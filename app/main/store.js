@@ -2,28 +2,26 @@ import { ipcMain } from 'electron';
 import { applyMiddleware, createStore } from 'redux';
 import createNodeLogger from 'redux-node-logger';
 import createSagaMiddleware from 'redux-saga';
-import { reducer } from '../reducer';
-import { init } from '../renderer/router';
+import { reducer } from '@shared/reducer';
 import saga from './sagas';
 
 const initialState = {};
 const sagaMiddleware = createSagaMiddleware();
 
-const windows = new Map();
+const windows = [];
 
 const getFromRenderers = store => next => {
   ipcMain.on('redux-register', (event) => {
     const { sender } = event;
-    const { id } = sender;
-    windows.set(id, sender);
-    next({ ...init(), meta: { renderer: id }});
+    windows.push(sender);
 
     sender.once('destroyed', () => {
-      windows.delete(id);
+      const index = windows.indexOf(sender);
+      windows.splice(index, 1);
     });
 
     const state = store.getState();
-    event.returnValue = [state, id];
+    event.returnValue = state;
   });
 
   ipcMain.on('redux-action', (event, action) => {
@@ -35,7 +33,7 @@ const getFromRenderers = store => next => {
 
 const forwardToRenderers = _store => next => {
   const sendAll = action => {
-    for (let window of windows.values()) {
+    for (let window of windows) {
       window.send('redux-broadcast', action);
     }
     next(action);

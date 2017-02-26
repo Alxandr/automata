@@ -1,7 +1,7 @@
 import { PropTypes } from 'react';
 import { createStyleSheet } from 'jss-theme-reactor';
 import { setDisplayName } from 'recompose';
-import { withStyleSheet, withClasses, removeInvalid } from '../styles/styled';
+import { removeInvalid, withClasses, withStyleSheet } from '../styles/styled';
 import { composeComponent } from '../utils';
 
 const styleSheet = createStyleSheet('Table', ({

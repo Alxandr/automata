@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@shared": ["shared"],
+      "@windowid": ["main/windowid"],
+      "@renderer": ["renderer"],
+      "@styles": ["renderer/styles"],
+      "@i18n": ["renderer/i18n"],
+      "@components": ["renderer/components"]
+    }
+  }
+}

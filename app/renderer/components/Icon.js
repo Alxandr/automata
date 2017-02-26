@@ -2,8 +2,8 @@ import React,{ PropTypes } from 'react';
 import { createStyleSheet } from 'jss-theme-reactor';
 import { setDisplayName } from 'recompose';
 import warning from 'warning';
-import { withStyleSheet, withClasses, removeInvalid } from '../styles/styled';
-import { composeComponent, addClass } from '../utils';
+import { removeInvalid, withClasses, withStyleSheet } from '../styles/styled';
+import { addClass, composeComponent } from '../utils';
 
 const iconClassName = 'automata-icon';
 

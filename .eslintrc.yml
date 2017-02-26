@@ -30,3 +30,8 @@ rules:
     - error
     - argsIgnorePattern: ^_
   no-case-declarations: 0
+  no-constant-condition:
+    - error
+    - checkLoops: false
+  sort-imports:
+    - error

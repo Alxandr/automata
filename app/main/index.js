@@ -1,5 +1,5 @@
 import { app, dialog } from 'electron';
-import window from 'electron-window';
+import { createWindow } from './sagas';
 
 let debug = false;
 if (process.env.NODE_ENV === 'development') {
@@ -14,11 +14,7 @@ async function start() {
     console.log(`Added extension: ${await installExtension(REDUX_DEVTOOLS)}`);
   }
 
-  console.log(`Create main window`);
-  const mainWindow = window.createWindow({ width: 1024, height: 728 });
-  mainWindow.showUrl(`${__dirname}/../assets/html/main.html`);
-
-  require('./main');
+  require('./store');
 }
 
 app.on('ready', () => {

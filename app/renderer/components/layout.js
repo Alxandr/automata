@@ -1,7 +1,7 @@
 import { PropTypes } from 'react';
 import { createStyleSheet } from 'jss-theme-reactor';
 import { compose, setDisplayName } from 'recompose';
-import { withStyleSheet, withClasses, removeInvalid } from '../styles/styled';
+import { removeInvalid, withClasses, withStyleSheet } from '../styles/styled';
 
 const styleSheet = createStyleSheet('Layout', () => ({
   columnLayout: {

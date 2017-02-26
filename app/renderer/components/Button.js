@@ -1,9 +1,9 @@
 import { PropTypes } from 'react';
 import { createStyleSheet } from 'jss-theme-reactor';
-import { setDisplayName } from 'recompose';
+import { defaultProps, setDisplayName } from 'recompose';
 import Color from 'color';
 import Icon from './Icon';
-import { withStyleSheet, withClasses, removeInvalid } from '../styles/styled';
+import { removeInvalid, withClasses, withStyleSheet } from '../styles/styled';
 import { composeComponent } from '../utils';
 
 const styleSheet = createStyleSheet('Button', ({
@@ -16,7 +16,9 @@ const styleSheet = createStyleSheet('Button', ({
   white,
   darkCyan,
   green,
-  darkGreen
+  darkGreen,
+  transparent,
+  linkVisitedColor
 }) => ({
   button: {
     padding: '0 1rem',
@@ -105,6 +107,19 @@ const styleSheet = createStyleSheet('Button', ({
         background: darkGreen,
         color: white
       }
+    },
+
+    '&$link': {
+      background: transparent,
+      color: linkColor,
+      borderColor: transparent,
+      textDecoration: 'underline',
+
+      '&:hover, &:active': {
+        background: transparent,
+        color: Color(linkVisitedColor).darken(.2).string(),
+        borderColor: transparent
+      }
     }
   },
 
@@ -113,15 +128,17 @@ const styleSheet = createStyleSheet('Button', ({
   shadow: {},
   disabled: {},
   primary: {},
-  success: {}
+  success: {},
+  link: {}
 }));
 
 const Button =
   composeComponent(
     setDisplayName('Button'),
     withStyleSheet(styleSheet),
-    withClasses(({ primary, success }) => ({ button: true, primary, success })),
+    withClasses(({ primary, success, link }) => ({ button: true, primary, success, link })),
     removeInvalid(),
+    defaultProps({ type: 'button' }),
     'button'
   );
 

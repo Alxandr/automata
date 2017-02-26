@@ -1,0 +1,29 @@
+{
+  // Use IntelliSense to learn about possible Node.js debug attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Debug Main Process",
+      "program": "${workspaceRoot}/app/main/index.js",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+      "windows": {
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
+      },
+      "runtimeArgs": [
+        "--enable-logging",
+        "-r", "babel-register",
+        "-r", "babel-polyfill",
+        "./app"
+      ],
+      "cwd": "${workspaceRoot}",
+      "env": {
+        "HOT": "1",
+        "NODE_ENV": "development"
+      }
+    }
+  ]
+}

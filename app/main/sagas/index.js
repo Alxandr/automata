@@ -1,5 +1,6 @@
-import { fork } from 'redux-saga/effects';
-import versions from '../../parts/versions/saga';
+import { call, cancel, fork } from 'redux-saga/effects';
+import runWindow from './runWindow';
+import versions from './versions';
 
 /*const named = (name, fn) => {
   Object.defineProperty(fn, 'name', {
@@ -19,6 +20,18 @@ const withProgress = fn => named(`withProgress(${fn.name})`, function* (action) 
   }
 });*/
 
-export default function* saga() {
+function* tasks() {
   yield fork(versions);
+}
+
+export default function* saga() {
+  const subTasks = yield fork(tasks);
+
+  yield call(runWindow, {
+    width: 1024,
+    height: 728,
+    module: 'root'
+  });
+
+  yield cancel(subTasks);
 }

@@ -1,33 +1,14 @@
+import { compose, createEagerFactory } from 'recompose';
+
 import { Component } from 'react';
-import createHelperInner from 'recompose/createHelper';
-import { createEagerFactory, compose } from 'recompose';
-import { createSelector } from 'reselect';
 import classNames from 'classnames';
+import createHelper from './createHelper';
 
-export const perWindow = (reducer) => (state = {}, action) => {
-  const window = action && action.meta && action.meta.renderer;
-  if (typeof window !== 'undefined') {
-    const windowState = state[window];
-    const newWindowState = reducer(windowState, action);
-    if (newWindowState !== windowState) {
-      return { ...state, [window]: newWindowState };
-    }
-  }
-
-  return state;
+export {
+  createHelper
 };
 
-export const forWindow = (renderId, selector) => {
-  return createSelector(
-    selector,
-    (allWindows) => allWindows[renderId]
-  );
-};
-
-export const createHelper = (fn, name) => {
-  Object.defineProperty(fn, 'name', { value: name });
-  return createHelperInner(fn, name);
-};
+export { default as reduxSagaForm } from './reduxSagaForm';
 
 const removeObjectProps = (obj, names) =>
   Object.keys(obj)
