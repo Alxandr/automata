@@ -1,7 +1,7 @@
-import { ipcRenderer } from 'electron';
-import { applyMiddleware, createStore } from 'redux';
-import createLogger from 'redux-logger';
+import { applyMiddleware, compose, createStore } from 'redux';
+
 import getWindowId from '@windowid';
+import { ipcRenderer } from 'electron';
 import { reducer } from '@shared/reducer';
 
 const initialState = ipcRenderer.sendSync('redux-register');
@@ -26,8 +26,10 @@ const forwardToMain = _store => next => {
 export const store = createStore(
   reducer,
   initialState,
-  applyMiddleware(
-    forwardToMain,
-    createLogger()
+  compose(
+    applyMiddleware(
+      forwardToMain
+    ),
+    window.devToolsExtension ? window.devToolsExtension() : f => f
   )
 );

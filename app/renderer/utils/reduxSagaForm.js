@@ -9,11 +9,14 @@ import { connect } from 'react-redux';
 import createHelper from './createHelper';
 import createIsValid from 'redux-form/lib/selectors/isValid';
 import { createSelector } from 'reselect';
+import defaultShouldValidate from 'redux-form/lib/defaultShouldValidate';
 import { formStateSelector } from '@shared/window';
+import generateValidator from 'redux-form/lib/generateValidator';
 import mapValues from 'lodash.mapvalues';
+import merge from 'lodash.merge';
 import structure from 'redux-form/lib/structure/plain';
 
-const { deepEqual, empty, getIn, fromJS } = structure;
+const { deepEqual, empty, getIn, keys, fromJS } = structure;
 const isValid = createIsValid(structure);
 
 const {
@@ -56,6 +59,7 @@ const defaultConfig = {
   getFormState: formStateSelector,
   pure: true,
   forceUnregisterOnUnmount: false,
+  shouldValidate: defaultShouldValidate
 };
 
 const reduxSagaForm = createHelper(initialConfig => BaseComponent => {
@@ -95,6 +99,112 @@ const reduxSagaForm = createHelper(initialConfig => BaseComponent => {
       };
     }
 
+    initIfNeeded(nextProps) {
+      const { enableReinitialize } = this.props;
+      if (nextProps) {
+        if ((enableReinitialize || !nextProps.initialized) && !deepEqual(this.props.initialValues, nextProps.initialValues)) {
+          const keepDirty = nextProps.initialized && this.props.keepDirtyOnReinitialize;
+          this.props.initialize(nextProps.initialValues, keepDirty);
+        }
+      } else if (this.props.initialValues && (!this.props.initialized || enableReinitialize)) {
+        this.props.initialize(this.props.initialValues, this.props.keepDirtyOnReinitialize);
+      }
+    }
+
+    updateSyncErrorsIfNeeded(nextSyncErrors, nextError) {
+      const { error, syncErrors, updateSyncErrors } = this.props;
+      const noErrors = (!syncErrors || !Object.keys(syncErrors).length) && !error;
+      const nextNoErrors = (!nextSyncErrors || !Object.keys(nextSyncErrors).length) && !nextError;
+      if (!(noErrors && nextNoErrors) && (!deepEqual(syncErrors, nextSyncErrors) || !deepEqual(error, nextError))) {
+        updateSyncErrors(nextSyncErrors, nextError);
+      }
+    }
+
+    validateIfNeeded(nextProps) {
+      const { shouldValidate, validate, values } = this.props;
+      const fieldLevelValidate = this.generateValidator();
+      if (validate || fieldLevelValidate) {
+        const initialRender = nextProps === undefined;
+        const fieldValidatorKeys = Object.keys(this.getValidators());
+        const shouldValidateResult = shouldValidate({
+          values,
+          nextProps,
+          props: this.props,
+          initialRender,
+          lastFieldValidatorKeys: this.lastFieldValidatorKeys,
+          fieldValidatorKeys,
+          structure
+        });
+
+        if (shouldValidateResult) {
+          const propsToValidate = initialRender ? this.props : nextProps;
+          const { _error, ...nextSyncErrors } = merge(
+            validate ? validate(propsToValidate.values, propsToValidate) || {} : {},
+            fieldLevelValidate ?
+            fieldLevelValidate(propsToValidate.values, propsToValidate) || {} : {}
+          );
+          this.lastFieldValidatorKeys = fieldValidatorKeys;
+          this.updateSyncErrorsIfNeeded(nextSyncErrors, _error);
+        }
+      }
+    }
+
+    updateSyncWarningsIfNeeded(nextSyncWarnings, nextWarning) {
+      const { warning, syncWarnings, updateSyncWarnings } = this.props;
+      const noWarnings = (!syncWarnings || !Object.keys(syncWarnings).length) && !warning;
+      const nextNoWarnings = (!nextSyncWarnings || !Object.keys(nextSyncWarnings).length) && !nextWarning;
+      if (!(noWarnings && nextNoWarnings) && (!deepEqual(syncWarnings, nextSyncWarnings) || !deepEqual(warning, nextWarning))) {
+        updateSyncWarnings(nextSyncWarnings, nextWarning);
+      }
+    }
+
+    warnIfNeeded(nextProps) {
+      const { shouldValidate, warn, values } = this.props;
+      const fieldLevelWarn = this.generateWarner();
+      if (warn || fieldLevelWarn) {
+        const initialRender = nextProps === undefined;
+        const fieldWarnerKeys = Object.keys(this.getWarners());
+        const shouldWarnResult = shouldValidate({
+          values,
+          nextProps,
+          props: this.props,
+          initialRender,
+          lastFieldValidatorKeys: this.lastFieldWarnerKeys,
+          fieldValidatorKeys: fieldWarnerKeys,
+          structure
+        });
+
+        if (shouldWarnResult) {
+          const propsToWarn = initialRender ? this.props : nextProps;
+          const { _warning, ...nextSyncWarnings } = merge(
+            warn ? warn(propsToWarn.values, propsToWarn) : {},
+            fieldLevelWarn ?
+              fieldLevelWarn(propsToWarn.values, propsToWarn) : {}
+          );
+
+          this.lastFieldWarnerKeys = fieldWarnerKeys;
+          this.updateSyncWarningsIfNeeded(nextSyncWarnings, _warning);
+        }
+      }
+    }
+
+    componentWillMount() {
+      this.initIfNeeded();
+      this.validateIfNeeded();
+      this.warnIfNeeded();
+    }
+
+    componentWillReceiveProps(nextProps) {
+      this.initIfNeeded(nextProps);
+      this.validateIfNeeded(nextProps);
+      this.warnIfNeeded(nextProps);
+      if (nextProps.onChange) {
+        if (!deepEqual(nextProps.values, this.props.values)) {
+          nextProps.onChange(nextProps.values);
+        }
+      }
+    }
+
     componentWillUnmount() {
       const { destroyOnUnmount, destroy } = this.props;
       if (destroyOnUnmount) {
@@ -105,6 +215,14 @@ const reduxSagaForm = createHelper(initialConfig => BaseComponent => {
 
     getValues() {
       return this.props.values;
+    }
+
+    isValid() {
+      return this.props.valid;
+    }
+
+    isPristine() {
+      return this.props.pristine;
     }
 
     register(name, type, getValidator, getWarner) {
@@ -131,14 +249,73 @@ const reduxSagaForm = createHelper(initialConfig => BaseComponent => {
 
     submit(evt) {
       evt.preventDefault();
-      this.props.startSubmit();
-      this.props.dispatch({
-        type: '@form/SUBMIT',
-        payload: this.getValues(),
-        meta: {
-          form: this.props.form
+      this._handleSubmit(this.props, this.props.validExceptSubmit, this.asyncValidate, this.getFieldList({ excludeFieldArray: true }));
+    }
+
+    _handleSubmit(props, valid, asyncValidate, fields) {
+      const { dispatch, startSubmit, touch, persistentSubmitErrors } = props;
+
+      touch(...fields);
+      if (valid || persistentSubmitErrors) {
+        startSubmit();
+        dispatch({
+          type: '@form/SUBMIT',
+          payload: this.getValues(),
+          meta: {
+            form: this.props.form
+          }
+        });
+      }
+    }
+
+    getFieldList(options) {
+      const registeredFields = this.props.registeredFields;
+      const list = [];
+      if (!registeredFields) {
+        return list;
+      }
+
+      let keySeq = keys(registeredFields);
+      if (options && options.excludeFieldArray) {
+        keySeq = keySeq.filter(name => getIn(registeredFields, `['${name}'].type`) !== 'FieldArray');
+      }
+
+      return fromJS(keySeq.reduce((acc, key) => {
+        acc.push(key);
+        return acc;
+      }, list));
+    }
+
+    getValidators() {
+      const validators = {};
+      Object.keys(this.fieldValidators).forEach(name => {
+        const validator = this.fieldValidators[name]();
+        if (validator) {
+          validators[name] = validator;
         }
       });
+      return validators;
+    }
+
+    generateValidator() {
+      const validators = this.getValidators();
+      return Object.keys(validators).length ? generateValidator(validators, structure) : undefined;
+    }
+
+    getWarners() {
+      const warners = {};
+      Object.keys(this.fieldWarners).forEach(name => {
+        const warner = this.fieldWarners[name]();
+        if (warner) {
+          warners[name] = warner;
+        }
+      });
+      return warners;
+    }
+
+    generateWarner() {
+      const warners = this.getWarners();
+      return Object.keys(warners).length ? generateValidator(warners, structure) : undefined;
     }
 
     render() {

@@ -1,29 +1,19 @@
-import React, { Component, PropTypes } from 'react';
-import ReactDOM from 'react-dom';
-import { ipcRenderer } from 'electron';
 import { Provider, connect } from 'react-redux';
-import { createEagerFactory } from 'recompose';
-import { createSelector, createStructuredSelector } from 'reselect';
+import React, { Component, PropTypes } from 'react';
 import { lockedSelector, windowSelector } from '@shared/window';
-import ThemeProvider from '@styles/ThemeProvider';
+
 import ProgressLock from '@components/ProgressLock';
+import ReactDOM from 'react-dom';
 import Router from '@components/Router';
+import ThemeProvider from '@styles/ThemeProvider';
+import { composeComponent } from './utils';
+import { createStructuredSelector } from 'reselect';
+import { ipcRenderer } from 'electron';
 import { setId } from './windowid';
 import { store } from './store';
-import { composeComponent } from './utils';
 
 const windowId = ipcRenderer.sendSync('window-get-id');
 setId(windowId);
-
-const LoadWindow = ({ match }) => {
-  const Component = require(`./modules${match.path}`).default;
-  const factory = createEagerFactory(Component);
-  return factory({});
-};
-
-LoadWindow.propTypes = {
-  match: PropTypes.object.isRequired
-};
 
 const mapStateToProgressProps = createStructuredSelector({
   locked: lockedSelector
@@ -34,57 +24,58 @@ const ConnectedProgressLock =
     ProgressLock
   );
 
-const mapStateToMainComponent = createStructuredSelector({
-  Window: createSelector(
-    windowSelector,
-    (module) => {
-      try {
-        return require(`./modules/${module}`).default;
-      } catch (e) {
-        const NotFound = () => (
-          <h1>Module {module} not found!</h1>
-        );
-        return NotFound;
-      }
-    }
-  )
-});
 // TODO: make scale depend on window size?
-const App = composeComponent(
-  connect(mapStateToMainComponent, null, null, { pure: true }),
-  class App extends Component {
-    static propTypes = {
-      Window: PropTypes.func.isRequired
-    };
+class App extends Component {
+  static propTypes = {
+    children: PropTypes.node.isRequired
+  };
 
-    render() {
-      const { Window } = this.props;
+  render() {
+    const { children } = this.props;
 
-      return (
-        <ThemeProvider>
-            <Router>
-              <div className="root">
-                <Window />
-                <ConnectedProgressLock scale={4} />
-              </div>
-            </Router>
-        </ThemeProvider>
-      );
-    }
+    return (
+      <ThemeProvider>
+          <Router>
+            <div className="root">
+              { children }
+              <ConnectedProgressLock scale={3} />
+            </div>
+          </Router>
+      </ThemeProvider>
+    );
+  }
 
-    componentDidMount() {
-      console.log(`Send: window-${windowId}-ready`);
-      ipcRenderer.send(`window-${windowId}-ready`);
-    }
-  });
+  componentDidMount() {
+    ipcRenderer.send(`window-${windowId}-ready`);
+  }
+}
 
-const Root = () => (
+const moduleName = windowSelector(store.getState());
+let Window;
+try {
+  Window = require(`./modules/${moduleName}/index`).default;
+} catch (e) {
+  const NotFound = () => (
+    <div>
+      <h1>Module {moduleName} not found!</h1>
+      <pre>
+        {e.stack}
+      </pre>
+    </div>
+  );
+  Window = NotFound;
+}
+
+const Root = ({ children }) => (
   <Provider store={store}>
-    <App />
+    <App>
+      {children}
+    </App>
   </Provider>
 );
+Root.propTypes = {
+  children: PropTypes.node.isRequired
+};
 
-document.addEventListener('DOMContentLoaded', () => {
-  const root = document.getElementById('root');
-  ReactDOM.render(<Root />, root);
-});
+const root = document.getElementById('root');
+ReactDOM.render(<Root><Window /></Root>, root);

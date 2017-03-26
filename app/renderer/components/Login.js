@@ -35,15 +35,29 @@ const mapDispatchToProps = {
   cancel
 };
 
+const validate = values => {
+  const errors = {};
+  if (!values.username) {
+    errors.username = 'Required';
+  }
+
+  if (!values.password) {
+    errors.password = 'Required';
+  }
+
+  return errors;
+};
+
 const Login =
   composeComponent(
     setDisplayName('Login'),
     withStyleSheet(styleSheet),
     connect(null, mapDispatchToProps),
     reduxSagaForm({
-      form: 'login'
+      form: 'login',
+      validate
     }),
-    ({ classes, cancel, handleSubmit }) => (
+    ({ classes, cancel, handleSubmit, pristine, invalid, submitting }) => (
       <div className={classes.login}>
         <form onSubmit={handleSubmit}>
           <h1 className={classes.title}>Login to Factorio</h1>
@@ -56,7 +70,7 @@ const Login =
           <br />
           <br />
           <div className={classes.formActions}>
-            <Button type="submit" primary>Login</Button>
+            <Button type="submit" primary disabled={ pristine || invalid || submitting }>Login</Button>
             <Button link onClick={cancel}>Cancel</Button>
           </div>
         </form>

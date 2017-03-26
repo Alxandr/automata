@@ -5,3 +5,8 @@ export const localVersionsSelector = compose(
   state => state.local,
   versionsSelector
 );
+
+export const onlineVersionsSelector = compose(
+  state => state.online,
+  versionsSelector
+);

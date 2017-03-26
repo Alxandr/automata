@@ -1,16 +1,23 @@
 import {
-  SET_VERSIONS
+  SET_ONLINE_VERSIONS,
+  SET_VERSIONS,
 } from './constants';
 
 const handlers = {
   [SET_VERSIONS]: (state, { payload }) => ({
     ...state,
     local: payload
+  }),
+
+  [SET_ONLINE_VERSIONS]: (state, { payload }) => ({
+    ...state,
+    online: payload
   })
 };
 
 const initialState = {
-  local: []
+  local: [],
+  online: []
 };
 
 export default (state = initialState, action) => {

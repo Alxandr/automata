@@ -1,5 +1,8 @@
-import os from 'os';
-import { Client } from './client';
+import { SAXParser } from 'parse5';
+import { get } from './api';
+import { osName } from '../app';
+
+const url = 'https://www.factorio.com/download';
 
 const APP_OSNAME = Object.freeze({
   win: 'win64-manual',
@@ -7,27 +10,42 @@ const APP_OSNAME = Object.freeze({
   linux: 'linux64'
 });
 
-const osName = (() => {
-  const type = os.type();
-  switch (type) {
-    case 'Darwin': return 'osx';
-    case 'Windows_NT': return 'win';
-    case 'Linux': return 'linux';
-    default:
-      console.error(`Unknown OS name ${type}, defaulting to linux.`); // eslint-disable-line no-console
-      return 'linux';
-  }
-})();
+const versionRegex = new RegExp(`^\\/get-download\\/(\\d+\\.\\d+\\.\\d+)\\/alpha\\/${APP_OSNAME[osName]}$`, 'i');
+const parseVersions = (response) => new Promise((resolve) => {
+  console.log('Regex: ', versionRegex);
+  const versions = [];
+  const parser = new SAXParser();
+  parser.on('startTag', (name, attrs) => {
+    if (name.toLowerCase() === 'a') {
+      const href = attrs.find(attr => attr.name.toLowerCase() === 'href') || null;
+      if (href === null) {
+        return;
+      }
 
-const versionRegex = new RegExp(`^\/get-download\/(\d+\.\d+\.\d+)\/alpha\/${APP_OSNAME[osName]}$`, 'i');
+      const match = versionRegex.exec(href.value.trim());
+      if (match) {
+        const version = {
+          name: `${match[1]} (alpha)`,
+          url: href.value.trim()
+        };
+        versions.push(version);
+      }
+    }
+  });
 
-const client = new Client('www.factorio.com');
+  parser.on('finish', () => {
+    resolve(versions);
+  });
 
-export const getVersions = async () => {
-  const response = await client.get('download');
-  if (response.url.includes('login')) {
+  response.body.pipe(parser);
+});
+
+export const getVersions = async (session) => {
+  const response = await get({ session, url, redirect: 'manual' });
+  if (response.status === 302) {
     return 'NEED_LOGIN';
   }
 
-  throw new Error('TODO: implement');
+  const versions = await parseVersions(response);
+  return versions;
 };

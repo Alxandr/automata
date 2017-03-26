@@ -1,9 +1,10 @@
 import React,{ PropTypes } from 'react';
+import { addClass, composeComponent } from '../utils';
+import { removeInvalid, withClasses, withStyleSheet } from '../styles/styled';
+
 import { createStyleSheet } from 'jss-theme-reactor';
 import { setDisplayName } from 'recompose';
 import warning from 'warning';
-import { removeInvalid, withClasses, withStyleSheet } from '../styles/styled';
-import { addClass, composeComponent } from '../utils';
 
 const iconClassName = 'automata-icon';
 
@@ -558,7 +559,7 @@ const Icon =
         `Icon with type ${type} not found`
       );
 
-      return ['icon', type];
+      return [ 'icon', type ];
     }),
     addClass(iconClassName),
     removeInvalid(),

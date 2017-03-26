@@ -1,16 +1,17 @@
 import React, { PropTypes } from 'react';
-import { createStyleSheet } from 'jss-theme-reactor';
-import { defaultProps, setDisplayName } from 'recompose';
-import classNames from 'classnames';
+import { defaultProps, setDisplayName, withProps } from 'recompose';
+
 import { Field } from 'redux-form';
-import Button from './Button';
-import Icon from './Icon';
-import { withStyleSheet } from '../styles/styled';
+import classNames from 'classnames';
 import { composeComponent } from '../utils';
+import { createStyleSheet } from 'jss-theme-reactor';
+import { withStyleSheet } from '../styles/styled';
 
 const styleSheet = createStyleSheet('Input', ({
   inputRestState,
-  inputFocusState
+  inputFocusState,
+  green,
+  red
 }) => ({
   control: {
     display: 'inline-block',
@@ -20,13 +21,10 @@ const styleSheet = createStyleSheet('Input', ({
     verticalAlign: 'middle',
     margin: '.325rem 0',
     lineHeight: '1',
+    width: '10.875rem',
 
-    '&$text': {
-      width: '10.875rem',
-
-      '&$fullSize': {
-        width: '100%'
-      }
+    '&$fullSize': {
+      width: '100%'
     },
 
     '& $helperButton': {
@@ -40,10 +38,17 @@ const styleSheet = createStyleSheet('Input', ({
       height: '1.875rem',
       padding: '0 .6rem',
       fontSize: '.75rem'
+    },
+
+    '&$success $input': {
+      border: `1px solid ${green}`
+    },
+
+    '&$error $input': {
+      border: `1px solid ${red}`
     }
   },
 
-  text: {},
   fullSize: {},
 
   label: {
@@ -67,38 +72,45 @@ const styleSheet = createStyleSheet('Input', ({
       borderColor: inputFocusState
     }
   },
-  helperButton: {}
+  helperButton: {},
+  success: {},
+  error: {}
 }));
 
-const Input =
+const FieldComponent =
   composeComponent(
-    setDisplayName('Input'),
+    setDisplayName('FieldComponent'),
     withStyleSheet(styleSheet),
-    defaultProps({ type: 'text' }),
-    ({ classes, label, name, type, fullSize, className: inputClass }) => {
+    ({ classes, fullSize, className: inputClass, input, label, meta: { touched, error }, inputComponent: InputComponent, ...rest }) => {
       const className = classNames(inputClass, classes.control, {
         [classes.fullSize]: fullSize,
-        [classes.text]: type === 'text' || type === 'password'
+        [classes.success]: touched && !error,
+        [classes.error]: touched && error
       });
 
       return (
         <div className={className}>
           <label>
             <span className={classes.label}>{label}</span>
-            <Field component="input" type={type} name={name} className={classes.input} />
+            <InputComponent className={classes.input} {...rest} {...input} />
           </label>
-          <Button className={classes.helperButton} tabIndex="-1">
-            <Icon type="cross" />
-          </Button>
         </div>
       );
     }
   );
 
+const Input =
+  composeComponent(
+    setDisplayName('Input'),
+    withProps({ component: FieldComponent }),
+    defaultProps({ inputComponent: defaultProps({ type: 'text' })('input') }),
+    Field
+  );
+
 Input.propTypes = {
   label: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  type: PropTypes.string
+  InputComponent: PropTypes.func
 };
 
 export default Input;

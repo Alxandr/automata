@@ -1,13 +1,14 @@
 import React, { PropTypes } from 'react';
-import { setDisplayName } from 'recompose';
+import { composeComponent, onMounted } from '@renderer/utils';
+import { download, fetchLocalVersions, localVersionsSelector } from '@shared/versions';
+
+import Button from '@components/Button';
+import Icon from '@components/Icon';
+import Page from './Page';
+import Table from '@components/Table';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import Page from './Page';
-import Icon from '@components/Icon';
-import Button from '@components/Button';
-import Table from '@components/Table';
-import { download, fetchLocalVersions, localVersionsSelector } from '@shared/versions';
-import { composeComponent, onMounted } from '@renderer/utils';
+import { setDisplayName } from 'recompose';
 
 const mapStateToProps = createStructuredSelector({
   local: localVersionsSelector

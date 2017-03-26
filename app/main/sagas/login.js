@@ -1,10 +1,12 @@
 import * as formActionCreators from 'redux-form';
 
-import { call, cancel, fork, join, put, race, take } from 'redux-saga/effects';
+import { call, put, take } from 'redux-saga/effects';
+import { lock, unlock } from '@shared/window/actions';
 
-import { CANCEL } from '@shared/window/constants';
+import attemptLogin from '../factorio/login';
 import mapValues from 'lodash.mapvalues';
-import runWindow from './runWindow';
+import modal from './modal';
+import { setLogin } from '@shared/login/actions';
 import { submitFilter } from '@shared/window/filters';
 
 const named = (name, fn) => {
@@ -14,22 +16,6 @@ const named = (name, fn) => {
   });
   return fn;
 };
-
-const modal = fn => named(`modal(${fn.name})`, function* (id) {
-  const task = yield fork(fn, id);
-  const result = yield race({
-    result: join(task),
-    cancel: take(({ type, meta }) => type === CANCEL && meta.window === id)
-  });
-
-  yield cancel(task);
-
-  if (result.cancel) {
-    return ['cancel'];
-  }
-
-  return ['ok', result.result];
-});
 
 const addWindow = (fn) => named(`withWindow(${fn.name})`, (window, ...args) => {
   const action = fn(...args);
@@ -66,22 +52,30 @@ function* doLogin(id) {
       continue;
     }
 
-    // TODO: do login
+    yield put(lock(id));
+    const session = yield call(attemptLogin, username, password);
+    yield put(unlock(id));
+    if (session === null) {
+      yield put(stopSubmit(id, 'login', { password: 'Wrong login' }));
+      continue;
+    }
+
+    return session;
   }
 }
 
 export default function* login(parent) {
-  const [exit, result] = yield call(runWindow, {
-    modal: true,
+  const [ exit, result ] = yield call(modal, {
     parent,
     width: 400,
     height: 300,
     module: 'login'
-  }, modal(doLogin));
+  }, doLogin);
 
   switch (exit) {
     case 'ok':
-      return result;
+      yield put(setLogin(result));
+      return true;
 
     case 'cancel':
     case 'close':

@@ -1,9 +1,10 @@
 import { Component, PropTypes } from 'react';
-import { createEagerFactory } from 'recompose';
+
 import classNames from 'classnames';
-import warning from 'warning';
-import isValidAttr from './is-valid-attr';
+import { createEagerFactory } from 'recompose';
 import { createHelper } from '../utils';
+import isValidAttr from './is-valid-attr';
+import warning from 'warning';
 
 export const withStyleSheet = createHelper(styleSheet => BaseComponent => {
   const factory = createEagerFactory(BaseComponent);
@@ -62,7 +63,7 @@ export const withClasses = createHelper((...compNames) => BaseComponent => {
       return all.concat(names);
     }, [className]);
 
-    return factory({...props, classes, className: classNames(names) });
+    return factory({ ...props, classes, className: classNames(names) });
   };
 
   WithClasses.propTypes = {

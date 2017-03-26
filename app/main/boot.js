@@ -1,4 +1,5 @@
 require('module-alias/register');
-require('../shared/aliases');
-require('./aliases');
+const { main } = require('../../aliases');
+
+require('module-alias').addAliases(main);
 require('./index');

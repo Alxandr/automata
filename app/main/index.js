@@ -1,18 +1,37 @@
 import { app, dialog } from 'electron';
-import { createWindow } from './sagas';
 
 let debug = false;
 if (process.env.NODE_ENV === 'development') {
   debug = true;
   require('electron-debug')();
+} else {
+  const sourceMapSupport = require('source-map-support');
+  sourceMapSupport.install();
 }
 
-async function start() {
-  if (debug) {
-    const { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS, default: installExtension } = require('electron-devtools-installer');
-    console.log(`Added extension: ${await installExtension(REACT_DEVELOPER_TOOLS)}`);
-    console.log(`Added extension: ${await installExtension(REDUX_DEVTOOLS)}`);
+const installExtensions = async () => {
+  if (process.env.NODE_ENV === 'development') {
+    const installer = require('electron-devtools-installer');
+
+    const extensions = [
+      'REACT_DEVELOPER_TOOLS',
+      'REDUX_DEVTOOLS'
+    ];
+
+    const forceDownload = !!process.env.UPGRADE_EXTENSIONS;
+
+    try {
+      for (const ext of extensions) {
+        installer.default(installer[ext], forceDownload);
+      }
+    } catch (e) {
+      console.error(e); // eslint-disable-line no-console
+    }
   }
+};
+
+async function start() {
+  await installExtensions();
 
   require('./store');
 }

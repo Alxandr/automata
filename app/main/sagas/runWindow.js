@@ -25,7 +25,7 @@ const getOpts = ({ modal = false, module, path, width, height, parent }) => {
     parent = windows.get(parent) || null;
   }
 
-  return [module, path, parentId, { modal, width, height, parent }];
+  return [ module, path, parentId, { modal, width, height, parent } ];
 };
 
 const resolveEmpty = resolve => () => resolve();
@@ -56,7 +56,7 @@ function* waitForClose(window, id) {
     const doneHandler = (_evt, exit, result) => {
       cleanup();
       if (live) {
-        emitter([exit, result]);
+        emitter([ exit, result ]);
         emitter(END);
         live = false;
       }
@@ -87,13 +87,28 @@ function* waitForClose(window, id) {
   }
 }
 
-function* infiniteSaga() {
+export function* infiniteSaga() {
   const channel = eventChannel(() => () => {});
   yield take(channel);
 }
 
+export const doWithWindow = (id, fn) => {
+  const win = windows.get(id);
+  if (win) {
+    fn(win);
+  }
+};
+
+function* progress(win, winId) {
+  while (true) {
+    const action = yield take(({ type, meta }) => type === 'WINDOW_PROGRESS' && meta && meta.window === winId);
+    const progress = action.payload;
+    win.setProgressBar(progress);
+  }
+}
+
 export default function* runWindow(options, saga = infiniteSaga) {
-  const [module, path, parent, opts] = getOpts(options);
+  const [ module, path, parent, opts ] = getOpts(options);
   const id = nextId();
 
   // Create router entry
@@ -116,7 +131,7 @@ export default function* runWindow(options, saga = infiniteSaga) {
     const windowTask = yield fork(waitForClose, window, id);
 
     // load boot html file
-    window.loadURL(`file://${__dirname}/../../renderer/assets/html/window.html`);
+    window.loadURL(`file://${__dirname}/../../app.html`);
     //window.show();
 
     // create wait for render promise
@@ -132,11 +147,13 @@ export default function* runWindow(options, saga = infiniteSaga) {
     // wait for render promise
     if (process.env.NODE_ENV === 'development') {
       // if dev, timeout at 1 sec (as it might have crashed).
+      console.log('start dev race');
       yield race({
         r: renderP,
         o: delay(1000)
       });
     } else {
+      console.log(`env: ${process.env.NODE_ENV}`);
       yield renderP;
     }
 
@@ -145,6 +162,7 @@ export default function* runWindow(options, saga = infiniteSaga) {
       yield put(unlock(parent));
     }
     window.show();
+    window.focus();
 
     // mark as completed (so it doesn't get destroyed in finally)
     hasError = false;
@@ -152,20 +170,24 @@ export default function* runWindow(options, saga = infiniteSaga) {
     // create saga task
     const sagaTask = yield fork(saga, id);
 
+    // create progress task
+    const progressTask = yield fork(progress, window, id);
+
     // wait for either window close or saga completion
     const result = yield race({
       close: join(windowTask),
-      exit: join(sagaTask)
+      done: join(sagaTask)
     });
 
     // cancel remaining task
+    yield cancel(progressTask);
     yield cancel(sagaTask);
     yield cancel(windowTask);
 
     // if there is an result, return it
-    if (result.close) {
+    if (result.done) {
       // TODO: ensure array
-      return result.close;
+      return result.done;
     } else {
       return ['close'];
     }

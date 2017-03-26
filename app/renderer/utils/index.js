@@ -43,6 +43,21 @@ export const onMounted = createHelper(fn => BaseComponent => {
   return OnMounted;
 }, 'onMounted');
 
+export const onWillMount = createHelper(fn => BaseComponent => {
+  const factory = createEagerFactory(BaseComponent);
+  class OnWillMount extends Component {
+    componentWillMount() {
+      fn(this.props);
+    }
+
+    render() {
+      return factory(this.props);
+    }
+  }
+
+  return OnWillMount;
+});
+
 export const composeComponent = (...args) => {
   const fns = args.slice(0, args.length - 1);
   const comp = args[args.length - 1];
