@@ -107,10 +107,20 @@ const Input =
     Field
   );
 
+// TODO: This does not work (looks really wrong, and sets value instead of checked).
+const Checkbox =
+  composeComponent(
+    setDisplayName('Input.Checkbox'),
+    defaultProps({ inputComponent: defaultProps({ type: 'checkbox' })('input') }),
+    Input
+  );
+
 Input.propTypes = {
   label: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
-  InputComponent: PropTypes.func
+  inputComponent: PropTypes.func
 };
+
+Input.Checkbox = Checkbox;
 
 export default Input;

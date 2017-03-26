@@ -39,3 +39,12 @@ export const getAll = async (type) => {
 
   return result.rows;
 };
+
+export const insert = async (id, doc) => {
+  const result =  await db.put({
+    ...doc,
+    _id: id
+  });
+
+  return { id: result.id, rev: result.rev };
+};

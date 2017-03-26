@@ -1,9 +1,10 @@
 import React, { PropTypes } from 'react';
-import { composeComponent, onMounted } from '@renderer/utils';
+import { composeComponent, onMounted, reduxSagaForm } from '@renderer/utils';
 import { download, fetchLocalVersions, localVersionsSelector } from '@shared/versions';
 
 import Button from '@components/Button';
 import Icon from '@components/Icon';
+import Input from '@components/Input';
 import Page from './Page';
 import Table from '@components/Table';
 import { connect } from 'react-redux';
@@ -20,6 +21,9 @@ const Versions =
   composeComponent(
     setDisplayName('Versions'),
     connect(mapStateToProps, mapDispatchToProps),
+    reduxSagaForm({
+      form: 'versions'
+    }),
     onMounted(({ fetchLocal }) => fetchLocal()),
     ({ local, download }) => {
       const display = local.length > 0 ? (
@@ -38,6 +42,12 @@ const Versions =
   );
 
 const ShowVersions = ({ versions }) => {
+  const rows = versions.map(({ name }) => (
+    <Table.Row key={name}>
+      <Table.Cell><Input.Checkbox name={name} /></Table.Cell>
+      <Table.Cell>{name}</Table.Cell>
+    </Table.Row>
+  ));
   return (
     <Table border bordered>
       <Table.Header>
@@ -46,6 +56,9 @@ const ShowVersions = ({ versions }) => {
           <Table.HeaderCell>Version</Table.HeaderCell>
         </Table.Row>
       </Table.Header>
+      <Table.Body>
+        {rows}
+      </Table.Body>
     </Table>
   );
 };

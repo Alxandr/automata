@@ -1,16 +1,17 @@
 import { DOWNLOAD, FETCH_LOCAL_VERSIONS, onlineVersionsSelector, setOnlineVersions, setVersions } from '@shared/versions';
 import { call, put, select, take, takeLatest } from 'redux-saga/effects';
+import { getAll, insert } from '../db';
 import { getAppDir, osName } from '../app';
 import { isLoggedInSelector, sessionSelector } from '@shared/login';
 import { lock, unlock } from '@shared/window/actions';
 
 import downloadFile from './downloadFile';
-import { getAll } from '../db';
 import { getVersions } from '../factorio/versions';
 import { join as joinPath } from 'path';
 import login from './login';
 import modal from './modal';
 import { submitFilter } from '@shared/window/filters';
+import unpack from '../factorio/unpack';
 
 const ext = (() => {
   switch (osName) {
@@ -75,18 +76,30 @@ function* browseFactorioVersions({ meta: { window } = {} }) {
     }));
     yield put(setOnlineVersions(displayVersions));
     const selectedVersion = yield call(showDownloadWindow, window);
+    if (!selectedVersion) return;
+
     const { url, name } = selectedVersion;
     const dlDir = getAppDir('download', 'versions');
     const filePath = joinPath(dlDir, name + ext);
     yield call(downloadFile, window, `https://www.factorio.com${url}`, filePath, session);
-    // TODO: Unpack. Copy to "versions" folder, add to db and delete downloaded archive.
+
+    const versionDir = getAppDir('versions', name);
+    const appPath = yield call(unpack, filePath, versionDir);
+    yield call(addLocal, name, appPath);
   } finally {
     yield put(unlock(window));
   }
 }
 
+function* addLocal(name, path) {
+  yield call(insert, `versions/${name}`, { name, path });
+  yield call(fetchLocal);
+}
+
 function* getLocal() {
-  return yield call(getAll, 'versions');
+  const rows = yield call(getAll, 'versions');
+
+  return rows.map(v => v.doc);
 }
 
 function* fetchLocal() {

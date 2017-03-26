@@ -11,5 +11,5 @@ export const windowSelector = createSelector(
 
 export const lockedSelector = createSelector(
   windowDataSelector,
-  ({ locked }) => locked
+  ({ locked }) => locked > 0
 );

@@ -1,7 +1,8 @@
 import React, { PropTypes } from 'react';
-import { createStyleSheet } from 'jss-theme-reactor';
 import { compose, defaultProps, setDisplayName } from 'recompose';
 import { withClasses, withStyleSheet } from '../styles/styled';
+
+import { createStyleSheet } from 'jss-theme-reactor';
 
 const size = 64;
 const border = 3;
@@ -99,7 +100,7 @@ const Preloader =
     setDisplayName('Preloader'),
     withStyleSheet(styleSheet),
     defaultProps({ scale: 1 }),
-    withClasses(({ scale }) => [`s${scale}`, 'centered'])
+    withClasses(({ scale }) => [ `s${scale}`, 'centered' ])
   )(({ className, classes }) => (
     <div className={className}>
       <div className={classes.spinner} />

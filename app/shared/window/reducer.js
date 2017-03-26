@@ -1,4 +1,5 @@
 import { EXIT, INIT, LOCK, UNLOCK } from './constants';
+
 import { remove } from '@shared/utils';
 
 const handlers = {
@@ -6,7 +7,7 @@ const handlers = {
     ...state,
     [id]: {
       module,
-      locked: false
+      locked: 0
     }
   }),
 
@@ -16,7 +17,7 @@ const handlers = {
     ...state,
     [id]: {
       ...state[id],
-      locked: true
+      locked: state[id].locked + 1
     }
   }),
 
@@ -24,7 +25,7 @@ const handlers = {
     ...state,
     [id]: {
       ...state[id],
-      locked: false
+      locked: state[id].locked - 1
     }
   })
 };
