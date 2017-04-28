@@ -1,75 +1,124 @@
-import { Provider, connect } from 'react-redux';
-import React, { Component, PropTypes } from 'react';
-import { lockedSelector, windowSelector } from '@shared/window';
+import MuiThemeProvider, { MUI_SHEET_ORDER } from 'material-ui/styles/MuiThemeProvider';
+import React, { Component } from 'react';
+import { blue, pink } from 'material-ui/styles/colors';
+import { composeComponent, onMounted } from '@renderer/utils';
 
-import ProgressLock from '@components/ProgressLock';
+import AppFrame from '@components/appframe';
+import PropTypes from 'prop-types';
+import { Provider } from 'react-redux';
 import ReactDOM from 'react-dom';
 import Router from '@components/Router';
-import ThemeProvider from '@styles/ThemeProvider';
-import { composeComponent } from './utils';
-import { createStructuredSelector } from 'reselect';
+import createMuiTheme from 'material-ui/styles/theme';
+import createPalette from 'material-ui/styles/palette';
 import { ipcRenderer } from 'electron';
+import { setDisplayName } from 'recompose';
 import { setId } from './windowid';
 import { store } from './store';
+import { windowSelector } from '@shared/window';
 
 const windowId = ipcRenderer.sendSync('window-get-id');
 setId(windowId);
 
-const mapStateToProgressProps = createStructuredSelector({
+/*const mapStateToProgressProps = createStructuredSelector({
   locked: lockedSelector
 });
 const ConnectedProgressLock =
   composeComponent(
     connect(mapStateToProgressProps),
     ProgressLock
-  );
+  );*/
 
-// TODO: make scale depend on window size?
-class App extends Component {
-  static propTypes = {
-    children: PropTypes.node.isRequired
-  };
+// TODO: move to state.
+let styleManager = null;
+const App = composeComponent(
+  setDisplayName('RootApp'),
+  onMounted(() => ipcRenderer.send(`window-${windowId}-ready`)),
+  ({ children, dark }) => {
+    const palette = createPalette({
+      primary: blue,
+      accent: pink,
+      type: dark ? 'dark' : 'light',
+    });
 
-  render() {
-    const { children } = this.props;
+    const theme = createMuiTheme({ palette });
+
+    if (!styleManager) {
+      const themeContext = MuiThemeProvider.createDefaultContext({ theme });
+      styleManager = themeContext.styleManager;
+    } else {
+      styleManager.updateTheme(theme);
+    }
+
+    styleManager.setSheetOrder(MUI_SHEET_ORDER);
 
     return (
-      <ThemeProvider>
-          <Router>
-            <div className="root">
-              { children }
-              <ConnectedProgressLock scale={3} />
-            </div>
-          </Router>
-      </ThemeProvider>
+      <MuiThemeProvider theme={theme} styleManager={styleManager}>
+        <Router>
+          <AppFrame>
+            { children }
+            {/*<ConnectedProgressLock scale={3} />*/}
+          </AppFrame>
+        </Router>
+      </MuiThemeProvider>
     );
   }
+);
 
-  componentDidMount() {
-    ipcRenderer.send(`window-${windowId}-ready`);
-  }
-}
+App.propTypes = {
+  children: PropTypes.node.isRequired
+};
 
 const moduleName = windowSelector(store.getState());
-let Window;
-try {
-  Window = require(`./modules/${moduleName}/index`).default;
-} catch (e) {
-  const NotFound = () => (
-    <div>
-      <h1>Module {moduleName} not found!</h1>
-      <pre>
-        {e.stack}
-      </pre>
-    </div>
-  );
-  Window = NotFound;
+const loadComponent = (() => {
+  const dc = m => m.default;
+  const err = e => {
+    const NotFound = () => (
+      <div>
+        <h1>Module {moduleName} not found!</h1>
+        <pre>
+          { e ? e.stack : 'Module not configured.' }
+        </pre>
+      </div>
+    );
+
+    return NotFound;
+  };
+
+  switch (moduleName) {
+    case 'root': return System.import('./modules/root').then(dc).catch(err);
+    case 'login': return System.import('./modules/login').then(dc).catch(err);
+    case 'dl_factorio': return System.import('./modules/dl_factorio').then(dc).catch(err);
+    default: return Promise.resolve(err(null));
+  }
+})();
+class Window extends Component {
+  constructor() {
+    super();
+
+    this.state = { WindowComponent: null };
+  }
+
+  componentWillMount() {
+    loadComponent.then(WindowComponent => {
+      this.setState(state => ({ ...state, WindowComponent }));
+    });
+  }
+
+  render() {
+    const { WindowComponent } = this.state;
+
+    if (!WindowComponent) {
+      return null;
+    }
+
+    return <WindowComponent />;
+  }
 }
 
 const Root = ({ children }) => (
   <Provider store={store}>
     <App>
-      {children}
+      { children }
     </App>
   </Provider>
 );

@@ -1,80 +1,39 @@
-import { composeComponent, reduxSagaForm } from '../../utils';
+import { composeComponent, reduxSagaForm } from '@renderer/utils';
 import { createSelector, createStructuredSelector } from 'reselect';
-import { withClasses, withStyleSheet } from '@styles/styled';
 
-import Button from '@components/Button';
-import Input from '@components/Input';
+import Button from 'material-ui/Button';
 import React from 'react';
+import { Select } from '@components/form';
+import Text from 'material-ui/Text';
+import Toolbar from 'material-ui/Toolbar';
 import { cancel } from '@shared/window';
 import { connect } from 'react-redux';
 import { createStyleSheet } from 'jss-theme-reactor';
 import { onlineVersionsSelector } from '@shared/versions';
 import { setDisplayName } from 'recompose';
+import { withStyleSheet } from '@styles/styled';
 
-const styleSheet = createStyleSheet('DlFactorioWindow', ({
-  white
-}) => ({
-  window: {
-    width: '25rem',
-    height: '14rem',
-    backgroundColor: white,
-    padding: '1.25rem'
+const styleSheet = createStyleSheet('DlFactorio', () => ({
+  root: {
+    display: 'flex',
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center'
   },
 
-  title: {
-    fontWeight: '300',
-    fontStyle: 'normal'
+  form: {
+    width: 400,
+    paddingTop: 30,
+    paddingBottom: 30
   },
 
-  thin: {
-    height: '1px'
+  button: {
   },
 
-  formActions: {},
-
-  select: {
-    borderRadius: 0,
-    position: 'relative'
-  },
-
-  wrapper: {
-    position: 'relative',
-
-    '&:after': {
-      display: 'block',
-      position: 'absolute',
-      right: '.6rem',
-      top: '22%',
-      font: 'normal normal normal 1.2em/1 metro',
-      fontSize: 'inherit',
-      textRendering: 'auto',
-      fontSmoothing: 'antialiased',
-      verticalAlign: 'middle',
-      textAlign: 'center',
-      pointerEvents: 'none',
-      content: '"\\e64b"'
-    }
+  toolbar: {
+    padding: 0
   }
 }));
-
-const Select = composeComponent(
-  setDisplayName('Select'),
-  withStyleSheet(styleSheet),
-  withClasses('select'),
-  ({ options, className, classes, ...input }) => {
-    const opts = options.map(({ name, value }) => (
-      <option value={value} key={value}>{name}</option>
-    ));
-
-    return (
-      <div className={classes.wrapper}>
-        <select {...input} className={className}>
-          {opts}
-        </select>
-      </div>
-    );
-  }
-);
 
 const versionsSelector = createSelector(
   onlineVersionsSelector,
@@ -97,30 +56,26 @@ const mapDispatchToProps = {
   cancel
 };
 
-const Window =
-  composeComponent(
-    setDisplayName('Window'),
-    withStyleSheet(styleSheet),
-    connect(mapStateToProps, mapDispatchToProps),
-    reduxSagaForm({
-      form: 'download'
-    }),
-    ({ versions, handleSubmit, classes, cancel, invalid, submitting }) => (
-      <div className={classes.window}>
-        <form onSubmit={handleSubmit}>
-          <h1 className={classes.title}>Download Factorio</h1>
-          <hr className={classes.thin} />
-          <br />
-          <Input name="version" label="Version:" fullSize inputComponent={Select} options={versions} />
-          <br />
-          <br />
-          <div className={classes.formActions}>
-            <Button type="submit" primary disabled={ versions.length === 0 || invalid || submitting }>Download</Button>
-            <Button link onClick={cancel}>Cancel</Button>
-          </div>
-        </form>
-      </div>
-    )
-  );
+const Window = composeComponent(
+  setDisplayName('DlFactorio'),
+  withStyleSheet(styleSheet),
+  connect(mapStateToProps, mapDispatchToProps),
+  reduxSagaForm({
+    form: 'download'
+  }),
+  ({ versions, handleSubmit, classes, cancel, invalid, submitting }) => (
+    <div className={ classes.root }>
+      <form className={ classes.form } onSubmit={ handleSubmit }>
+        <Text type='title'>Download version</Text>
+        <br />
+        <Select label="Version" name="version" options={ versions } />
+        <Toolbar className={ classes.toolbar }>
+          <Button raised primary type='submit' className={ classes.button } disabled={ invalid || submitting }>Download</Button>
+          <Button className={ classes.button } onClick={ cancel }>Cancel</Button>
+        </Toolbar>
+      </form>
+    </div>
+  )
+);
 
 export default Window;

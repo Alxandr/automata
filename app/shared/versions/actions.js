@@ -1,6 +1,8 @@
 import {
   DOWNLOAD,
   FETCH_LOCAL_VERSIONS,
+  SELECT,
+  SELECT_ALL,
   SET_ONLINE_VERSIONS,
   SET_VERSIONS,
 } from './constants';
@@ -21,4 +23,13 @@ export const setOnlineVersions = versions => ({
 
 export const download = () => ({
   type: DOWNLOAD
+});
+
+export const select = (version) => ({
+  type: SELECT,
+  payload: version
+});
+
+export const selectAll = () => ({
+  type: SELECT_ALL
 });

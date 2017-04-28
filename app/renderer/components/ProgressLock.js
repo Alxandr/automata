@@ -1,7 +1,8 @@
-import React, { PropTypes } from 'react';
 import { compose, defaultProps, setDisplayName } from 'recompose';
 import { withClasses, withStyleSheet } from '../styles/styled';
 
+import PropTypes from 'prop-types';
+import React from 'react';
 import { createStyleSheet } from 'jss-theme-reactor';
 
 const size = 64;

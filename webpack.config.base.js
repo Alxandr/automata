@@ -2,28 +2,23 @@
  * Base webpack config used across other specific configs
  */
 
-import { dependencies as deps, devDependencies as devDeps } from './app/package.json';
-
 import path from 'path';
-
-const externals = {
-  ...(deps || {}),
-  ...(devDeps || {})
-};
+import webpack from 'webpack';
 
 export default {
   module: {
-    loaders: [ {
+    rules: [ {
       test: /\.js$/,
-      loaders: ['babel-loader'],
-      exclude: /node_modules/
+      loader: 'babel-loader',
+      exclude: [/node_modules/]
     }, {
       test: /\.json$/,
-      loaders: ['json-loader']
+      loader: 'json-loader'
     } ]
   },
 
   output: {
+    filename: '[name].js',
     path: path.join(__dirname, 'app'),
 
     // https://github.com/webpack/webpack/issues/1114
@@ -37,7 +32,11 @@ export default {
     extensions: [ '.js', '.json' ]
   },
 
-  plugins: [],
-
-  externals: Object.keys(externals)
+  plugins: [
+    new webpack.optimize.CommonsChunkPlugin({
+      minChunks: 2,
+      children: true,
+      async: true
+    })
+  ]
 };

@@ -1,8 +1,9 @@
-import { PropTypes } from 'react';
+import { removeInvalid, withClasses, withStyleSheet } from '../styles/styled';
+
+import PropTypes from 'prop-types';
+import { composeComponent } from '../utils';
 import { createStyleSheet } from 'jss-theme-reactor';
 import { setDisplayName } from 'recompose';
-import { removeInvalid, withClasses, withStyleSheet } from '../styles/styled';
-import { composeComponent } from '../utils';
 
 const styleSheet = createStyleSheet('Table', ({
   dark,

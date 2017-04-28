@@ -1,9 +1,10 @@
 /* eslint-disable react/prop-types */
 import * as importedActions from 'redux-form/lib/actions';
 
-import { Component, PropTypes } from 'react';
 import { createEagerFactory, wrapDisplayName } from 'recompose';
 
+import { Component } from 'react';
+import PropTypes from 'prop-types';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import createHelper from './createHelper';

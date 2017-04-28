@@ -1,7 +1,8 @@
-import React, { PropTypes } from 'react';
 import { defaultProps, setDisplayName, withProps } from 'recompose';
 
 import { Field } from 'redux-form';
+import PropTypes from 'prop-types';
+import React from 'react';
 import classNames from 'classnames';
 import { composeComponent } from '../utils';
 import { createStyleSheet } from 'jss-theme-reactor';

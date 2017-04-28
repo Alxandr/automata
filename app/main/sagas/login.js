@@ -67,7 +67,7 @@ function* doLogin(id) {
 export default function* login(parent) {
   const [ exit, result ] = yield call(modal, {
     parent,
-    width: 400,
+    width: 500,
     height: 300,
     module: 'login'
   }, doLogin);

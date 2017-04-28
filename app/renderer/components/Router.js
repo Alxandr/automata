@@ -1,10 +1,12 @@
-import React, { Component, PropTypes } from 'react';
-import { createPath } from 'history/PathUtils';
-import { Router } from 'react-router';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import React, { Component } from 'react';
 import { createSelector, createStructuredSelector } from 'reselect';
 import { go, goBack, goForward, push, replace } from '@shared/router';
+
+import PropTypes from 'prop-types';
+import { Router } from 'react-router';
+import { bindActionCreators } from 'redux';
+import { connect } from 'react-redux';
+import { createPath } from 'history/PathUtils';
 import { forWindow } from '@shared/utils';
 
 const canGo = (index, length) => n => {

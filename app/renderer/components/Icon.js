@@ -1,7 +1,8 @@
-import React,{ PropTypes } from 'react';
 import { addClass, composeComponent } from '../utils';
 import { removeInvalid, withClasses, withStyleSheet } from '../styles/styled';
 
+import PropTypes from 'prop-types';
+import React from 'react';
 import { createStyleSheet } from 'jss-theme-reactor';
 import { setDisplayName } from 'recompose';
 import warning from 'warning';

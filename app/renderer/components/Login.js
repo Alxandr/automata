@@ -1,8 +1,9 @@
-import React, { PropTypes } from 'react';
 import { composeComponent, reduxSagaForm } from '../utils';
 
 import Button from './Button';
 import Input from './Input';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { cancel } from '@shared/window';
 import { connect } from 'react-redux';
 import { createStyleSheet } from 'jss-theme-reactor';

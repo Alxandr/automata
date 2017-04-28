@@ -38,8 +38,8 @@ function* downloadWindowSaga(id) {
 function* showDownloadWindow(parent) {
   const [ exit, result ] = yield call(modal, {
     parent,
-    width: 400,
-    height: 240,
+    width: 500,
+    height: 230,
     module: 'dl_factorio'
   }, downloadWindowSaga);
 
@@ -105,7 +105,7 @@ function* getLocal() {
 function* fetchLocal() {
   const versions = yield call(getLocal);
 
-  yield put(setVersions(versions));
+  yield put(setVersions(versions.map(v => ({ ...v, selected: false }))));
 }
 
 export default function* versionsSaga() {

@@ -37,6 +37,9 @@ export default merge(baseConfig, {
     // https://webpack.github.io/docs/hot-module-replacement-with-webpack.html
     new webpack.HotModuleReplacementPlugin(),
 
+    // Emit module names?
+    new webpack.NamedModulesPlugin(),
+
     /**
      * If you are using the CLI, the webpack process will not exit with an error
      * code by enabling this plugin.
@@ -55,6 +58,10 @@ export default merge(baseConfig, {
      */
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify('development')
+    }),
+
+    new webpack.LoaderOptionsPlugin({
+      debug: true
     })
   ],
 

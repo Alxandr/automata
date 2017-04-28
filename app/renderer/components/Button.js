@@ -3,7 +3,7 @@ import { removeInvalid, withClasses, withStyleSheet } from '../styles/styled';
 
 import Color from 'color';
 import Icon from './Icon';
-import { PropTypes } from 'react';
+import PropTypes from 'prop-types';
 import { composeComponent } from '../utils';
 import { createStyleSheet } from 'jss-theme-reactor';
 

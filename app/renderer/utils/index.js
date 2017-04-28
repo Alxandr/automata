@@ -56,7 +56,7 @@ export const onWillMount = createHelper(fn => BaseComponent => {
   }
 
   return OnWillMount;
-});
+}, 'onWillMount');
 
 export const composeComponent = (...args) => {
   const fns = args.slice(0, args.length - 1);

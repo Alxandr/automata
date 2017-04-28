@@ -1,4 +1,6 @@
-import { Children, Component, PropTypes } from 'react';
+import { Children, Component } from 'react';
+
+import PropTypes from 'prop-types';
 import { create } from 'jss';
 import { createStyleManager } from 'jss-theme-reactor/styleManager';
 import jssPreset from 'jss-preset-default';
