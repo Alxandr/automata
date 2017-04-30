@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 import { reducer as formReducer } from 'redux-form';
+import { reducer as instances } from './instances';
 import { reducer as login } from './login';
 import perWindow from './utils/perWindow';
 import { reducer as router } from './router';
@@ -13,5 +14,6 @@ export const reducer = combineReducers({
   window,
   form,
   versions,
+  instances,
   login
 });

@@ -96,7 +96,7 @@ function* addLocal(name, path) {
   yield call(fetchLocal);
 }
 
-function* getLocal() {
+export function* getLocal() {
   const rows = yield call(getAll, 'versions');
 
   return rows.map(v => v.doc);

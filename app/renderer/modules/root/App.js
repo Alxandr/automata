@@ -3,10 +3,10 @@ import { Route, Switch } from 'react-router';
 import AppBar from './components/appbar';
 import AppContent from './components/appcontent';
 import AppFrame from '@components/appframe';
+import Instances from './components/instances';
 import React from 'react';
 import Versions from './components/versions';
 
-const Home = () => (<h1>Home</h1>);
 const NoMatch = () => (<h1>No match</h1>);
 
 const tabs = [
@@ -20,7 +20,7 @@ const App = () => (
 
     <AppContent>
       <Switch>
-        <Route  exact path="/" component={Home} />
+        <Route  exact path="/" component={Instances} />
         <Route path="/versions" component={Versions} />
         <Route component={NoMatch} />
       </Switch>

@@ -30,6 +30,12 @@ const db = (() => {
   return new Db('automata');
 })();
 
+export const get = async (id) => {
+  const result = await db.get(id);
+
+  return result;
+};
+
 export const getAll = async (type) => {
   const result = await db.allDocs({
     include_docs: true,

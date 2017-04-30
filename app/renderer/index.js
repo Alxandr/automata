@@ -70,7 +70,7 @@ App.propTypes = {
 
 const moduleName = windowSelector(store.getState());
 const loadComponent = (() => {
-  const dc = m => m.default;
+  const getDefault = moduleExports => moduleExports.default;
   const err = e => {
     const NotFound = () => (
       <div>
@@ -85,9 +85,10 @@ const loadComponent = (() => {
   };
 
   switch (moduleName) {
-    case 'root': return System.import('./modules/root').then(dc).catch(err);
-    case 'login': return System.import('./modules/login').then(dc).catch(err);
-    case 'dl_factorio': return System.import('./modules/dl_factorio').then(dc).catch(err);
+    case 'root': return System.import('./modules/root').then(getDefault).catch(err);
+    case 'login': return System.import('./modules/login').then(getDefault).catch(err);
+    case 'dl_factorio': return System.import('./modules/dl_factorio').then(getDefault).catch(err);
+    case 'new_inst': return System.import('./modules/new_inst').then(getDefault).catch(err);
     default: return Promise.resolve(err(null));
   }
 })();

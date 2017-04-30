@@ -2,10 +2,11 @@ import { buffers, channel } from 'redux-saga';
 import { call, cancel, fork, takeEvery } from 'redux-saga/effects';
 import runWindow, { doWithWindow } from './runWindow';
 
+import instances from './instances';
 import versions from './versions';
 
 const mainHandlers = {
-  'PROGRESS': function* progress(id, action) {
+  'PROGRESS': function progress(id, action) {
     doWithWindow(id, win => {
       win.setProgressBar(action.payload);
     });
@@ -28,6 +29,7 @@ function* mainWindow(id) {
 
 function* tasks() {
   yield fork(versions);
+  yield fork(instances);
 }
 
 export default function* saga() {

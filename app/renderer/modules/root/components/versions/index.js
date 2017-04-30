@@ -21,7 +21,7 @@ const versionPropType = PropTypes.shape({
 
 const styleSheet = createStyleSheet('Versions', theme => ({
   root: {
-    width: '100%'
+    display: 'flex'
   },
 
   addButton: {

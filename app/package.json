@@ -54,6 +54,7 @@
     "redux-saga": "^0.14.3",
     "reselect": "^3.0.0",
     "set-cookie-parser": "^2.0.0",
+    "slug": "^0.9.1",
     "source-map-support": "^0.4.11",
     "warning": "^3.0.0"
   },

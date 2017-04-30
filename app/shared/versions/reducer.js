@@ -8,12 +8,14 @@ import {
 const handlers = {
   [SET_VERSIONS]: (state, { payload }) => ({
     ...state,
-    local: payload
+    local: payload,
+    localLoaded: true
   }),
 
   [SET_ONLINE_VERSIONS]: (state, { payload }) => ({
     ...state,
-    online: payload
+    online: payload,
+    onlineLoaded: true
   }),
 
   [SELECT]: (state, { payload }) => ({
@@ -39,7 +41,9 @@ const handlers = {
 
 const initialState = {
   local: [],
-  online: []
+  online: [],
+  localLoaded: false,
+  onlineLoaded: false
 };
 
 export default (state = initialState, action) => {
