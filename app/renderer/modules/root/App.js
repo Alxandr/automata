@@ -3,6 +3,7 @@ import { Route, Switch } from 'react-router';
 import AppBar from './components/appbar';
 import AppContent from './components/appcontent';
 import AppFrame from '@components/appframe';
+import Instance from './components/instance';
 import Instances from './components/instances';
 import React from 'react';
 import Versions from './components/versions';
@@ -10,8 +11,8 @@ import Versions from './components/versions';
 const NoMatch = () => (<h1>No match</h1>);
 
 const tabs = [
-  { path: '/', exact: true, label: 'Instances' },
-  { path: '/versions', label: 'Versions' }
+  { path: '/', exact: true, label: 'Instances', reset: true },
+  { path: '/versions', label: 'Versions', reset: true }
 ];
 
 const App = () => (
@@ -20,8 +21,9 @@ const App = () => (
 
     <AppContent>
       <Switch>
-        <Route  exact path="/" component={Instances} />
-        <Route path="/versions" component={Versions} />
+        <Route  exact path='/' component={ Instances } />
+        <Route path='/versions' component={ Versions } />
+        <Route path='/instances/:slug' component={ Instance } />
         <Route component={NoMatch} />
       </Switch>
     </AppContent>

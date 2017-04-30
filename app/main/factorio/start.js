@@ -3,19 +3,16 @@ import { osName } from '../app';
 import { spawn } from 'child_process';
 
 const start_osx = async (dir) => {
-  const game = join(dir, 'factorio.app');
+  const game = join(dir, 'factorio.app', 'Contents', 'MacOS', 'factorio');
   const conf = join(dir, 'config.ini');
   //const log = join(dir, 'log.txt');
   const args = [
-    '-a',
-    game,
-    '--args',
     '-c',
     conf
   ];
 
   // TODO: write stdout and stderr to log file
-  const proc = spawn('open', args, { detached: true, stdio: [ 'ignore', 'ignore', 'ignore' ] });
+  const proc = spawn(game, args, { detached: true, stdio: [ 'ignore', 'ignore', 'ignore' ] });
   proc.unref();
 
   const code = await new Promise((res) => {
@@ -24,7 +21,7 @@ const start_osx = async (dir) => {
     });
   });
 
-  await new Promise(res => setTimeout(res, 30000));
+  await new Promise(res => setTimeout(res, 500));
   return code;
 };
 

@@ -1,13 +1,16 @@
 import { Tab, Tabs } from 'material-ui/Tabs';
+import { goBack, reset as routerReset } from '@shared/router';
 import { matchPath, withRouter } from 'react-router';
-import { push as routerPush, replace as routerReplace } from '@shared/router';
 import { setDisplayName, setPropTypes } from 'recompose';
 
 import AppBar from 'material-ui/AppBar';
+import ArrowBack from 'material-ui-icons/ArrowBack';
+import IconButton from 'material-ui/IconButton';
 import PropTypes from 'prop-types';
 import React from 'react';
 import Text from 'material-ui/Text';
 import Toolbar from 'material-ui/Toolbar';
+import classNames from 'classnames';
 import { composeComponent } from '@renderer/utils';
 import { connect } from 'react-redux';
 import { createStyleSheet } from 'jss-theme-reactor';
@@ -24,17 +27,25 @@ const styleSheet = createStyleSheet('RootAppBar', () => ({
     '& > div, & > div > div, & > div > div > div:first-child': {
       height: '100%',
     },
+  },
+
+  backButton: {
+    transition: 'width .5s, margin-left .5s',
+    marginLeft: -12
+  },
+  backButtonHidden: {
+    width: 0,
+    marginLeft: 0
   }
 }));
 
 const mapDispatchToNavItemProps = (dispatch, { tabs }) => ({
   onTabChange: (_, index) => {
     const tab = tabs[index];
-    const replace = Boolean(tab.replace);
-    return dispatch(replace ? routerPush(tab.path) : routerReplace(tab.path));
+    return dispatch(routerReset(tab.path));
   },
 
-  goHome: () => dispatch(routerPush('/'))
+  goBack: () => dispatch(goBack())
 });
 
 const RootAppBar = composeComponent(
@@ -53,7 +64,7 @@ const RootAppBar = composeComponent(
   withStyleSheet(styleSheet),
   connect(null, mapDispatchToNavItemProps),
   withRouter,
-  ({ classes, tabs, title, location, onTabChange, goHome }) => {
+  ({ classes, tabs, title, location, history, onTabChange, goBack }) => {
     let index = 0;
     for (; index < tabs.length; index++) {
       const match = matchPath(location.pathname, tabs[index]);
@@ -71,7 +82,12 @@ const RootAppBar = composeComponent(
     return (
       <AppBar>
         <Toolbar>
-          <Text type='title' colorInherit className={ classes.flex } onClick={ goHome }>{ title }</Text>
+          <IconButton contrast
+            className={ classNames(classes.backButton, { [classes.backButtonHidden]: history.index === 0 }) }
+            onClick={ goBack }>
+            <ArrowBack />
+          </IconButton>
+          <Text type='title' colorInherit className={ classes.flex }>{ title }</Text>
           <Tabs index={ index } onChange={ onTabChange } className={ classes.tabs }>
             { tabComps }
           </Tabs>

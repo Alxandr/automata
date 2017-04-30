@@ -1,7 +1,7 @@
 import { createSelector } from 'reselect';
-import memoize from 'lodash.memoize';
-import matchPath from 'react-router/matchPath';
 import { forWindow } from '@shared/utils';
+import matchPath from 'react-router/matchPath';
+import memoize from 'lodash.memoize';
 
 export const routerDataSelector = forWindow(state => state.router);
 

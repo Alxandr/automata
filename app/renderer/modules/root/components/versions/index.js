@@ -1,5 +1,5 @@
 import { Table, TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
-import { allVersionsSelected, download, fetchLocalVersions, localVersionsSelector, select, selectAll } from '@shared/versions';
+import { allVersionsSelected, download, fetchLocalVersions, localVersionsLoadedSelector, localVersionsSelector, select, selectAll } from '@shared/versions';
 import { composeComponent, onMounted } from '@renderer/utils';
 import { setDisplayName, setPropTypes } from 'recompose';
 
@@ -89,7 +89,8 @@ const ShowVersions = composeComponent(
 );
 
 const mapStateToProps = createStructuredSelector({
-  local: localVersionsSelector
+  local: localVersionsSelector,
+  loaded: localVersionsLoadedSelector
 });
 
 const mapDispatchToProps = { fetchLocal: fetchLocalVersions, download };
@@ -99,7 +100,11 @@ const Versions = composeComponent(
   connect(mapStateToProps, mapDispatchToProps),
   onMounted(({ fetchLocal }) => fetchLocal()),
   withStyleSheet(styleSheet),
-  ({ classes, local, download }) => {
+  ({ classes, local, download, loaded }) => {
+    if (!loaded) {
+      return null;
+    }
+
     const display = local.length > 0 ? (
       <ShowVersions versions={local} />
     ) : (
