@@ -6,7 +6,7 @@ versions of factorio and setting up instances that maintain their own saves/mods
 Warning: Very alpha level software!
 Currently only works on OSX, but getting it to work on windows and linux should be trivial,
 if someone would like to try it out on either of these platforms, contact me through a github
-issueso we can work it out.
+issues we can work it out.
 
 # Screenshots
 
