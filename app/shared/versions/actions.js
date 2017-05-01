@@ -5,6 +5,7 @@ import {
   SELECT_ALL,
   SET_ONLINE_VERSIONS,
   SET_VERSIONS,
+  TOGGLE_EXPERIMENTAL,
 } from './constants';
 
 export const fetchLocalVersions = () => ({
@@ -32,4 +33,8 @@ export const select = (version) => ({
 
 export const selectAll = () => ({
   type: SELECT_ALL
+});
+
+export const toggleExperimental = () => ({
+  type: TOGGLE_EXPERIMENTAL
 });

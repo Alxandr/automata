@@ -1,10 +1,9 @@
+import { DialogActions, DialogContent, DialogTitle } from 'material-ui/Dialog';
 import { composeComponent, reduxSagaForm } from '@renderer/utils';
 
 import Button from 'material-ui/Button';
 import React from 'react';
-import Text from 'material-ui/Text';
 import { TextField } from '@components/form';
-import Toolbar from 'material-ui/Toolbar';
 import { cancel } from '@shared/window';
 import { connect } from 'react-redux';
 import { createStyleSheet } from 'jss-theme-reactor';
@@ -12,24 +11,10 @@ import { setDisplayName } from 'recompose';
 import { withStyleSheet } from '@styles/styled';
 
 const styleSheet = createStyleSheet('Login', () => ({
-  root: {
-    display: 'flex',
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center'
-  },
-
   form: {
-    width: 400,
-    paddingTop: 30,
-    paddingBottom: 30
-  },
-
-  button: {
-  },
-
-  toolbar: {
-    padding: 0
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%'
   }
 }));
 
@@ -59,18 +44,17 @@ const LoginWindow = composeComponent(
     validate
   }),
   ({ classes, cancel, handleSubmit, pristine, invalid, submitting }) => (
-    <div className={ classes.root }>
-      <form className={ classes.form } onSubmit={ handleSubmit }>
-        <Text type='title'>Factorio login</Text>
-        <br />
+    <form className={ classes.form } onSubmit={ handleSubmit }>
+      <DialogTitle>Factorio login</DialogTitle>
+      <DialogContent>
         <TextField label='Username' name='username' />
         <TextField label='Password' name='password' type='password' />
-        <Toolbar className={ classes.toolbar }>
-          <Button raised primary type='submit' className={ classes.button } disabled={ pristine || invalid || submitting }>Login</Button>
-          <Button className={ classes.button } onClick={ cancel }>Cancel</Button>
-        </Toolbar>
-      </form>
-    </div>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={ cancel }>Cancel</Button>
+        <Button type='submit' primary disabled={ pristine || invalid || submitting }>Login</Button>
+      </DialogActions>
+    </form>
   )
 );
 

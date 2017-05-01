@@ -2,7 +2,8 @@ import { SAXParser } from 'parse5';
 import { get } from './api';
 import { osName } from '../app';
 
-const url = 'https://www.factorio.com/download';
+const stableUrl = 'https://www.factorio.com/download/stable';
+const experimentalUrl = 'https://www.factorio.com/download/experimental';
 
 const APP_OSNAME = Object.freeze({
   win: 'win64-manual',
@@ -12,7 +13,6 @@ const APP_OSNAME = Object.freeze({
 
 const versionRegex = new RegExp(`^\\/get-download\\/(\\d+\\.\\d+\\.\\d+)\\/alpha\\/${APP_OSNAME[osName]}$`, 'i');
 const parseVersions = (response) => new Promise((resolve) => {
-  console.log('Regex: ', versionRegex);
   const versions = [];
   const parser = new SAXParser();
   parser.on('startTag', (name, attrs) => {
@@ -40,12 +40,25 @@ const parseVersions = (response) => new Promise((resolve) => {
   response.body.pipe(parser);
 });
 
-export const getVersions = async (session) => {
+const getVersionsFromUrl = async (session, url, experimental) => {
   const response = await get({ session, url, redirect: 'manual' });
   if (response.status === 302) {
     return 'NEED_LOGIN';
   }
 
   const versions = await parseVersions(response);
-  return versions;
+  return versions.map(v => ({ ...v, experimental }));
+};
+
+export const getVersions = async (session) => {
+  const [ stable, experimental ] = await Promise.all([
+    getVersionsFromUrl(session, stableUrl, false),
+    getVersionsFromUrl(session, experimentalUrl, true)
+  ]);
+
+  if (stable === 'NEED_LOGIN' || experimental === 'NEED_LOGIN') {
+    return 'NEED_LOGIN';
+  }
+
+  return experimental.concat(stable);
 };

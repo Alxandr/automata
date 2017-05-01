@@ -3,6 +3,7 @@ import {
   SELECT_ALL,
   SET_ONLINE_VERSIONS,
   SET_VERSIONS,
+  TOGGLE_EXPERIMENTAL,
 } from './constants';
 
 const handlers = {
@@ -36,14 +37,20 @@ const handlers = {
         selected: !allSelected
       }))
     };
-  }
+  },
+
+  [TOGGLE_EXPERIMENTAL]: (state) => ({
+    ...state,
+    showExperimental: !state.showExperimental
+  })
 };
 
 const initialState = {
   local: [],
   online: [],
   localLoaded: false,
-  onlineLoaded: false
+  onlineLoaded: false,
+  showExperimental: false
 };
 
 export default (state = initialState, action) => {

@@ -39,7 +39,7 @@ function* showDownloadWindow(parent) {
   const [ exit, result ] = yield call(modal, {
     parent,
     width: 500,
-    height: 230,
+    height: 190,
     module: 'dl_factorio'
   }, downloadWindowSaga);
 

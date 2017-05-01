@@ -19,10 +19,10 @@ const versionCompare = ([ maj1, min1, pat1 ], [ maj2, min2, pat2 ]) => {
   return 0;
 };
 
-export const versionsSelector = state => state.versions;
+const rootSelector = state => state.versions;
 const _localVersionsSelector = compose(
   state => state.local,
-  versionsSelector
+  rootSelector
 );
 
 export const localVersionsSelector = createSelector(
@@ -30,9 +30,20 @@ export const localVersionsSelector = createSelector(
   versions => [...versions].sort((a, b) => 1 - versionCompare(parseVersion(a.name), parseVersion(b.name)))
 );
 
-export const onlineVersionsSelector = compose(
+export const allOnlineVersionsSelector = compose(
   state => state.online,
-  versionsSelector
+  rootSelector
+);
+
+export const showExperimentalSelector = compose(
+  state => state.showExperimental,
+  rootSelector
+);
+
+export const onlineVersionsSelector = createSelector(
+  allOnlineVersionsSelector,
+  showExperimentalSelector,
+  (online, showExperimental) => online.filter(({ experimental }) => !experimental || showExperimental)
 );
 
 export const allVersionsSelected = createSelector(
@@ -56,5 +67,5 @@ export const highestLocalVersionSelector = createSelector(
 
 export const localVersionsLoadedSelector = compose(
   state => state.localLoaded,
-  versionsSelector
+  rootSelector
 );

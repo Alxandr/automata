@@ -1,37 +1,29 @@
+import { DialogActions, DialogContent, DialogTitle } from 'material-ui/Dialog';
 import { composeComponent, reduxSagaForm } from '@renderer/utils';
 import { createSelector, createStructuredSelector } from 'reselect';
+import { onlineVersionsSelector, showExperimentalSelector, toggleExperimental } from '@shared/versions';
 
 import Button from 'material-ui/Button';
+import { LabelSwitch } from 'material-ui/Switch';
 import React from 'react';
 import { Select } from '@components/form';
-import Text from 'material-ui/Text';
-import Toolbar from 'material-ui/Toolbar';
 import { cancel } from '@shared/window';
 import { connect } from 'react-redux';
 import { createStyleSheet } from 'jss-theme-reactor';
-import { onlineVersionsSelector } from '@shared/versions';
 import { setDisplayName } from 'recompose';
 import { withStyleSheet } from '@styles/styled';
 
-const styleSheet = createStyleSheet('DlFactorio', () => ({
-  root: {
-    display: 'flex',
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center'
-  },
-
+const styleSheet = createStyleSheet('DlFactorio', theme => ({
   form: {
-    width: 400,
-    paddingTop: 30,
-    paddingBottom: 30
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%'
   },
 
-  button: {
-  },
-
-  toolbar: {
-    padding: 0
+  experimentalSwitch: {
+    position: 'absolute',
+    top: theme.spacing.unit,
+    right: theme.spacing.unit
   }
 }));
 
@@ -39,10 +31,12 @@ const versionsSelector = createSelector(
   onlineVersionsSelector,
   versions => versions
     .filter(({ installed }) => !installed)
-    .map(({ name }) => ({ name, value: name }))
+    .map(({ name, experimental }) => ({ name, value: name, experimental }))
 );
+
 const mapStateToProps = createStructuredSelector({
   versions: versionsSelector,
+  showExperimental: showExperimentalSelector,
 
   initialValues: createStructuredSelector({
     version: createSelector(
@@ -53,7 +47,8 @@ const mapStateToProps = createStructuredSelector({
 });
 
 const mapDispatchToProps = {
-  cancel
+  cancel,
+  toggleExperimental
 };
 
 const Window = composeComponent(
@@ -63,18 +58,21 @@ const Window = composeComponent(
   reduxSagaForm({
     form: 'download'
   }),
-  ({ versions, handleSubmit, classes, cancel, invalid, submitting }) => (
-    <div className={ classes.root }>
-      <form className={ classes.form } onSubmit={ handleSubmit }>
-        <Text type='title'>Download version</Text>
-        <br />
-        <Select label="Version" name="version" options={ versions } />
-        <Toolbar className={ classes.toolbar }>
-          <Button raised primary type='submit' className={ classes.button } disabled={ invalid || submitting }>Download</Button>
-          <Button className={ classes.button } onClick={ cancel }>Cancel</Button>
-        </Toolbar>
-      </form>
-    </div>
+  ({ versions, showExperimental, handleSubmit, classes, cancel, toggleExperimental, invalid, submitting }) => (
+    <form onSubmit={ handleSubmit } className={ classes.form }>
+      <DialogTitle>Download version</DialogTitle>
+      <DialogContent>
+        <LabelSwitch label='Show experimental'
+          checked={ showExperimental }
+          labelClassName={ classes.experimentalSwitch }
+          onChange={ toggleExperimental } />
+        <Select label='Version' name='version' options={ versions } />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={ cancel }>Cancel</Button>
+        <Button type='submit' primary disabled={ invalid || submitting }>Download</Button>
+      </DialogActions>
+    </form>
   )
 );
 

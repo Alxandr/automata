@@ -122,7 +122,8 @@ export default function* runWindow(options, saga = infiniteSaga) {
   // Create browser window
   const window = new BrowserWindow({
     ...opts,
-    show: false
+    show: false,
+    useContentSize: true
   });
 
   let hasError = true;

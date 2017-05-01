@@ -1,9 +1,11 @@
+import { LabelSwitch, Switch as MUISwitch } from 'material-ui/Switch';
 import { defaultProps, setDisplayName, setPropTypes } from 'recompose';
 
 import { Field } from 'redux-form';
 import FormControl from 'material-ui/Form/FormControl';
 import Input from 'material-ui/Input/Input';
 import InputLabel from 'material-ui/Input/InputLabel';
+import { LabelCheckbox } from 'material-ui/Checkbox';
 import MUITextField from 'material-ui/TextField';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -65,7 +67,8 @@ export const TextField = composeComponent(
 const SelectComponent = composeComponent(
   setDisplayName('SelectComponent'),
   setPropTypes({
-    options: PropTypes.array.isRequired
+    options: PropTypes.array.isRequired,
+    label: PropTypes.string.isRequired
   }),
   ({ input, label, options, meta: { touched, error } }) => (
     <MUISelectField label={ label } error={ Boolean(touched && error) } { ...input } options={ options } />
@@ -81,5 +84,52 @@ export const Select = composeComponent(
   }),
   ({ options, name, label }) => (
     <Field name={ name } component={ SelectComponent } label={ label } options={ options } />
+  )
+);
+
+const CheckboxComponent = composeComponent(
+  setDisplayName('CheckboxComponent'),
+  setPropTypes({
+    label: PropTypes.string.isRequired
+  }),
+  ({ input, label }) => (
+    <LabelCheckbox label={ label } checked={ input.value ? true : false } onChange={ input.onChange } />
+  )
+);
+
+export const Checkbox = composeComponent(
+  setDisplayName('Checkbox'),
+  setPropTypes({
+    name: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired
+  }),
+  ({ name, label }) => (
+    <Field name={ name } component={ CheckboxComponent } label={ label } />
+  )
+);
+
+const SwitchComponent = composeComponent(
+  setDisplayName('SwitchComponent'),
+  setPropTypes({
+    label: PropTypes.string,
+    className: PropTypes.string
+  }),
+  ({ input, label, className }) => {
+    const Comp = label ? LabelSwitch : MUISwitch;
+    const classProp = label ? { labelClassName: className } : { className };
+
+    return <Comp label={ label } checked={ input.value ? true : false } onChange={ input.onChange } { ...classProp } />;
+  }
+);
+
+export const Switch = composeComponent(
+  setDisplayName('Switch'),
+  setPropTypes({
+    name: PropTypes.string.isRequired,
+    label: PropTypes.string,
+    className: PropTypes.string
+  }),
+  ({ name, label, className }) => (
+    <Field name={ name } component={ SwitchComponent } label={ label } className={ className } />
   )
 );
