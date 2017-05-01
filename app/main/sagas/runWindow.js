@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron';
 import { END, delay, eventChannel } from 'redux-saga';
-import { cancel, fork, join, put, race, take } from 'redux-saga/effects';
+import { cancel, fork, join, put, race, setContext, take } from 'redux-saga/effects';
 import { exit, init, lock, unlock } from '@shared/window';
 
 // setup windows stack
@@ -107,7 +107,7 @@ function* progress(win, winId) {
   }
 }
 
-export default function* runWindow(options, saga = infiniteSaga) {
+function* runWindow(options, saga) {
   const [ module, path, parent, opts ] = getOpts(options);
   const id = nextId();
 
@@ -168,6 +168,9 @@ export default function* runWindow(options, saga = infiniteSaga) {
     // mark as completed (so it doesn't get destroyed in finally)
     hasError = false;
 
+    // set windowId in context
+    yield setContext({ windowId: id });
+
     // create saga task
     const sagaTask = yield fork(saga, id);
 
@@ -198,3 +201,8 @@ export default function* runWindow(options, saga = infiniteSaga) {
     }
   }
 }
+
+function* startWindow(options, saga = infiniteSaga) {
+  return yield fork(runWindow, options, saga);
+}
+export default startWindow;

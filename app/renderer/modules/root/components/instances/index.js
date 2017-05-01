@@ -9,7 +9,7 @@ import IconButton from 'material-ui/IconButton';
 import PlayArrowIcon from 'material-ui-icons/PlayArrow';
 import PropTypes from 'prop-types';
 import React from 'react';
-import Text from 'material-ui/Text';
+import Text from 'material-ui/Typography';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { createStyleSheet } from 'jss-theme-reactor';
@@ -28,7 +28,9 @@ const styleSheet = createStyleSheet('Instances', theme => ({
   },
 
   card: {
-    width: 200
+    width: 200,
+    margin: 10,
+    flex: 'none'
   },
 
   cardMedia: {
@@ -70,6 +72,13 @@ const styleSheet = createStyleSheet('Instances', theme => ({
     '&:hover': {
       backgroundColor: 'rgba(255, 255, 255, .4)'
     }
+  },
+
+  instances: {
+    display: 'flex',
+    width: '100%',
+    height: '100%',
+    flexWrap: 'wrap'
   }
 }));
 
@@ -120,10 +129,11 @@ const ShowInstances = composeComponent(
       PropTypes.shape(instanceShape).isRequired
     ).isRequired
   }),
-  ({ instances }) => {
+  withStyleSheet(styleSheet),
+  ({ instances, classes }) => {
     const instanceCards = instances.map(inst => <Instance { ...inst } key={ inst._id } />);
 
-    return <div>{ instanceCards }</div>;
+    return <div className={ classes.instances }>{ instanceCards }</div>;
   }
 );
 

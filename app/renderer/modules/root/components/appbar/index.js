@@ -8,7 +8,7 @@ import ArrowBack from 'material-ui-icons/ArrowBack';
 import IconButton from 'material-ui/IconButton';
 import PropTypes from 'prop-types';
 import React from 'react';
-import Text from 'material-ui/Text';
+import Text from 'material-ui/Typography';
 import Toolbar from 'material-ui/Toolbar';
 import classNames from 'classnames';
 import { composeComponent } from '@renderer/utils';
@@ -24,8 +24,17 @@ const styleSheet = createStyleSheet('RootAppBar', () => ({
   tabs: {
     height: '100%',
 
-    '& > div, & > div > div, & > div > div > div:first-child': {
+    '& > div': {
       height: '100%',
+
+      '& > div': {
+        height: '100%',
+
+        '& > div:first-child': {
+          height: '100%',
+          alignItems: 'center',
+        },
+      },
     },
   },
 

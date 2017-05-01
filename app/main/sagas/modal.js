@@ -32,8 +32,10 @@ export default function* modal(opts, saga) {
     throw new Error('Modal windows requires parent');
   }
 
-  return yield call(runWindow, {
+  const modalTask = yield call(runWindow, {
     ...opts,
     modal: true
   }, modalFn(saga));
+
+  return yield join(modalTask);
 }

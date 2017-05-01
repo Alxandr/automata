@@ -8,7 +8,7 @@ import Button from 'material-ui/Button';
 import Checkbox from 'material-ui/Checkbox';
 import PropTypes from 'prop-types';
 import React from 'react';
-import Text from 'material-ui/Text';
+import Text from 'material-ui/Typography';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { createStyleSheet } from 'jss-theme-reactor';
