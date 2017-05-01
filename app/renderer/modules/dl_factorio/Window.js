@@ -4,6 +4,7 @@ import { createSelector, createStructuredSelector } from 'reselect';
 import { onlineVersionsSelector, showExperimentalSelector, toggleExperimental } from '@shared/versions';
 
 import Button from 'material-ui/Button';
+import DialogForm from '@components/form/DialogForm';
 import { LabelSwitch } from 'material-ui/Switch';
 import React from 'react';
 import { Select } from '@components/form';
@@ -14,12 +15,6 @@ import { setDisplayName } from 'recompose';
 import { withStyleSheet } from '@styles/styled';
 
 const styleSheet = createStyleSheet('DlFactorio', theme => ({
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%'
-  },
-
   experimentalSwitch: {
     position: 'absolute',
     top: theme.spacing.unit,
@@ -59,7 +54,7 @@ const Window = composeComponent(
     form: 'download'
   }),
   ({ versions, showExperimental, handleSubmit, classes, cancel, toggleExperimental, invalid, submitting }) => (
-    <form onSubmit={ handleSubmit } className={ classes.form }>
+    <DialogForm onSubmit={ handleSubmit }>
       <DialogTitle>Download version</DialogTitle>
       <DialogContent>
         <LabelSwitch label='Show experimental'
@@ -72,7 +67,7 @@ const Window = composeComponent(
         <Button onClick={ cancel }>Cancel</Button>
         <Button type='submit' primary disabled={ invalid || submitting }>Download</Button>
       </DialogActions>
-    </form>
+    </DialogForm>
   )
 );
 

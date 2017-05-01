@@ -7,21 +7,12 @@ import { fetchLocalVersions, highestLocalVersionSelector, localVersionsLoadedSel
 import { setDisplayName, setPropTypes } from 'recompose';
 
 import Button from 'material-ui/Button';
+import DialogForm from '@components/form/DialogForm';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { cancel } from '@shared/window';
 import { connect } from 'react-redux';
-import { createStyleSheet } from 'jss-theme-reactor';
 import { slug } from '@shared/utils';
-import { withStyleSheet } from '@styles/styled';
-
-const styleSheet = createStyleSheet('NewInst', () => ({
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    width: '100%'
-  }
-}));
 
 const mapStateToProps = createStructuredSelector({
   instances: instancesSelector,
@@ -73,12 +64,11 @@ const Form = composeComponent(
     form: 'instance-prompt',
     validate
   }),
-  withStyleSheet(styleSheet),
-  ({ classes, handleSubmit, versions, cancel, invalid, submitting }) => {
+  ({ handleSubmit, versions, cancel, invalid, submitting }) => {
     const versionsOptions = versions.map(({ name }) => ({ name, value: name }));
 
     return (
-      <form onSubmit={ handleSubmit } className={ classes.form }>
+      <DialogForm onSubmit={ handleSubmit }>
         <DialogTitle>New Instance</DialogTitle>
         <DialogContent>
           <TextField label='Instance name' name='name' />
@@ -88,7 +78,7 @@ const Form = composeComponent(
           <Button onClick={ cancel }>Cancel</Button>
           <Button type='submit' primary disabled={ invalid || submitting }>Create</Button>
         </DialogActions>
-      </form>
+      </DialogForm>
     );
   }
 );

@@ -43,7 +43,7 @@ function* showNewInstanceWindow(parent) {
   const [ exit, result ] = yield call(modal, {
     parent,
     width: 500,
-    height: 300,
+    height: 245,
     module: 'new_inst'
   }, newInstanceWindowSaga);
 
