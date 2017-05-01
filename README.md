@@ -11,13 +11,13 @@ issues we can work it out.
 # Screenshots
 
 ## List of instances
-![list instances](http://i.imgur.com/3xR1BwD.png)
+![list instances](http://i.imgur.com/kYWAVHZ.png)
 
 ## List of versions
-![list versions](http://i.imgur.com/hYnRutO.png)
+![list versions](http://i.imgur.com/MishiUd.png)
 
 ## Download factorio version
-![download version](http://i.imgur.com/hODBEsV.png)
+![download version](http://i.imgur.com/NQzcO11.png)
 
 ## Create new instance
 ![create instance](http://i.imgur.com/Bfz8z7R.png)

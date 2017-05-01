@@ -131,6 +131,12 @@ function* runWindow(options, saga) {
     // create window task
     const windowTask = yield fork(waitForClose, window, id);
 
+    // set windowId in context
+    yield setContext({ windowId: id });
+
+    // create saga task
+    const sagaTask = yield fork(saga, id);
+
     // load boot html file
     window.loadURL(`file://${__dirname}/../../app.html`);
     //window.show();
@@ -167,12 +173,6 @@ function* runWindow(options, saga) {
 
     // mark as completed (so it doesn't get destroyed in finally)
     hasError = false;
-
-    // set windowId in context
-    yield setContext({ windowId: id });
-
-    // create saga task
-    const sagaTask = yield fork(saga, id);
 
     // create progress task
     const progressTask = yield fork(progress, window, id);
