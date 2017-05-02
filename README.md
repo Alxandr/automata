@@ -1,5 +1,7 @@
 # automata
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/Alxandr/automata.svg)](https://greenkeeper.io/)
+
 automata is a instance manager for factorio. It enables easy installation of different
 versions of factorio and setting up instances that maintain their own saves/mods/config.
 
