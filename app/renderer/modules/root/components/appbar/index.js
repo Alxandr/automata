@@ -38,6 +38,10 @@ const styleSheet = createStyleSheet('RootAppBar', () => ({
     },
   },
 
+  tab: {
+    height: '100%',
+  },
+
   backButton: {
     transition: 'width .5s, margin-left .5s',
     marginLeft: -12
@@ -86,7 +90,7 @@ const RootAppBar = composeComponent(
       index = 0;
     }
 
-    const tabComps = tabs.map(({ label }) => <Tab label={ label } key={ label } />);
+    const tabComps = tabs.map(({ label }) => <Tab label={ label } key={ label } className={ classes.tab } />);
 
     return (
       <AppBar>

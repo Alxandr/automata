@@ -16,7 +16,6 @@ const delay = (timeout) => () => new Promise(resolve => setTimeout(resolve, time
 
 const spawn = (bin, ...args) => () => new Promise((resolve, reject) => {
   switch (platform()) {
-    case 'win32': throw new Error('Not implemented for win32');
     default:
       bin = path.join(__dirname, 'node_modules', '.bin', bin);
   }
@@ -26,7 +25,7 @@ const spawn = (bin, ...args) => () => new Promise((resolve, reject) => {
   });
   proc.stdout.pipe(process.stdout);
   proc.stderr.pipe(process.stderr);
-  proc.on('error', reject);
+  proc.on('error', () => reject('Error ...'));
   setTimeout(resolve, 1000);
 });
 
