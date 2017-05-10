@@ -1,5 +1,7 @@
 import * as fs from 'fs';
 
+import { osName } from './app';
+
 export const exists = (path) => new Promise((res) => {
   fs.exists(path, res);
 });
@@ -39,4 +41,21 @@ export const numFiles = async (path, filter = _name => true) => {
   });
 
   return content.filter(filter).length;
+};
+
+export const link = async (linkLocation, linkTarget) => {
+  if (!(await isDir(linkTarget))) {
+    throw new Error(`${linkTarget} is not a directory`);
+  }
+
+  await new Promise((res, rej) => {
+    fs.symlink(linkTarget, linkLocation, 'junction', (err) => {
+      if (err) {
+        rej(err);
+        return;
+      }
+
+      res();
+    });
+  });
 };

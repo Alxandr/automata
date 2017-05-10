@@ -1,11 +1,10 @@
 import { CREATE_INSTANCE, FETCH_INSTANCES, START, setInstances } from '@shared/instances';
 import { call, put, spawn, take, takeLatest } from 'redux-saga/effects';
-import { exists, numFiles, write } from '../fs';
+import { exists, link, numFiles, write } from '../fs';
 import { get, getAll, insert } from '../db';
 import { getAppDir, osName } from '../app';
 import { lock, unlock } from '@shared/window/actions';
 
-import copy from 'recursive-copy';
 import { dialog } from 'electron';
 import { getLocal as getLocalVersions } from './versions';
 import modal from './modal';
@@ -14,7 +13,14 @@ import { slug } from '@shared/utils';
 import startGame from '../factorio/start';
 import { submitFilter } from '@shared/window/filters';
 
-const copyVersion = (versionDir, instDir) => copy(versionDir, instDir, { dot: true, junk: true });
+const gameDirName = (() => {
+  switch (osName) {
+    case 'osx': return 'factorio.app';
+    default: throw new Error('not implemented');
+  }
+})();
+
+const linkVersion = (versionPath, instanceDir) => link(pathJoin(instanceDir, gameDirName), versionPath);
 
 const msgBox = (() => {
   const showMsgBox = opts => new Promise(resolve => dialog.showMessageBox(null, opts, resolve));
@@ -86,7 +92,7 @@ function* createInstance({ meta: { window } = {} }) {
     const instanceDir = getAppDir('instances', slug);
 
     // Step 2: Copy game
-    yield call(copyVersion, version.path, instanceDir);
+    yield call(linkVersion, version.path, instanceDir);
 
     // Step 3: Write config file
     const confPath = pathJoin(instanceDir, 'config.ini');
