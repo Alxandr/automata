@@ -1,4 +1,6 @@
-import { stat as _stat } from 'fs';
+import { readdir as _readdir, rename as _rename, stat as _stat, createReadStream } from 'fs';
+
+import { Extract } from 'unzip';
 import copy from 'recursive-copy';
 import { join as joinPath } from 'path';
 import { osName } from '../app';
@@ -8,8 +10,31 @@ import { spawn } from 'child_process';
 const stat = path => new Promise((resolve, reject) => {
   _stat(path, (err, stat) => {
     if (err) reject(err);
-    resolve(stat);
+    else resolve(stat);
   });
+});
+
+const readdir = path => new Promise((resolve, reject) => {
+  _readdir(path, (err, stat) => {
+    if (err) reject(err);
+    else resolve(stat);
+  });
+});
+
+const rename = (from, to) => new Promise((resolve, reject) => {
+  _rename(from, to, (err) => {
+    if (err) reject(err);
+    else resolve();
+  });
+});
+
+const unzipTo = (zip, targetDir) => new Promise((resolve, reject) => {
+  createReadStream(zip)
+    .pipe(Extract({
+      path: targetDir
+    }))
+    .on('error', e => reject(e))
+    .on('close', () => resolve());
 });
 
 const isDir = async path => {
@@ -95,6 +120,22 @@ const unpack_osx = async (dmg, targetDir) => {
   }
 };
 
+const unpack_win = async (zip, targetDir) => {
+  await unzipTo(zip, targetDir);
+
+  // Windows zips include folders with version names
+  const folders = await readdir(targetDir);
+  const folder = folders[0];
+
+  if (!folder.startsWith('Factorio')) {
+    throw new Error('Windows zip format changed. Report bug with Automata.');
+  }
+
+  const targetFactorioDir = joinPath(targetDir, 'factorio');
+  await rename(joinPath(targetDir, folder), targetFactorioDir);
+  return targetFactorioDir;
+};
+
 const not_impl = os => async (_archive, _targetDir) => {
   throw new Error(`Archive extracting for ${os} not yet implemented`);
 };
@@ -102,7 +143,7 @@ const not_impl = os => async (_archive, _targetDir) => {
 export default (() => {
   switch (osName) {
     case 'osx': return unpack_osx;
-    case 'win': return not_impl('Windows');
+    case 'win': return unpack_win;
     case 'linux': return not_impl('Linux');
   }
 })();

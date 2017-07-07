@@ -1,6 +1,6 @@
 import MuiThemeProvider, { MUI_SHEET_ORDER } from 'material-ui/styles/MuiThemeProvider';
 import React, { Component } from 'react';
-import { blue, pink } from 'material-ui/styles/colors';
+import { blue, pink } from 'material-ui/colors';
 import { composeComponent, onMounted } from '@renderer/utils';
 
 import AppFrame from '@components/appframe';

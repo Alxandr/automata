@@ -1,4 +1,4 @@
-import { Card, CardContent, CardMedia } from 'material-ui/Card';
+import Card, { CardContent, CardMedia } from 'material-ui/Card';
 import { composeComponent, onMounted } from '@renderer/utils';
 import { createInstance, fetchLocalInstances, instancesSelector, start } from '@shared/instances';
 import { setDisplayName, setPropTypes } from 'recompose';
@@ -99,10 +99,10 @@ const mapInstanceDispatchToProps = (dispatch, props) => ({
 });
 
 const Instance = composeComponent(
-  setDisplayName('Instance'),
-  setPropTypes(instanceShape),
   connect(null, mapInstanceDispatchToProps),
   withStyleSheet(styleSheet),
+  setDisplayName('Instance'),
+  setPropTypes(instanceShape),
   ({ classes, name, icon, start, numSaves, mods, view }) => (
     <Card className={ classes.card } onClick={ view }>
       <CardMedia className={ classes.cardMedia }>
@@ -123,13 +123,13 @@ const Instance = composeComponent(
 );
 
 const ShowInstances = composeComponent(
+  withStyleSheet(styleSheet),
   setDisplayName('ShowInstances'),
   setPropTypes({
     instances: PropTypes.arrayOf(
       PropTypes.shape(instanceShape).isRequired
     ).isRequired
   }),
-  withStyleSheet(styleSheet),
   ({ instances, classes }) => {
     const instanceCards = instances.map(inst => <Instance { ...inst } key={ inst._id } />);
 
@@ -144,10 +144,10 @@ const mapStateToProps = createStructuredSelector({
 const mapDispatchToProps = { fetchLocal: fetchLocalInstances, createInstance };
 
 const Instances = composeComponent(
-  setDisplayName('Instances'),
   connect(mapStateToProps, mapDispatchToProps),
   onMounted(({ fetchLocal }) => fetchLocal()),
   withStyleSheet(styleSheet),
+  setDisplayName('Instances'),
   ({ classes, local, createInstance }) => {
     const display = local.length > 0 ? (
       <ShowInstances instances={local} />
@@ -158,7 +158,7 @@ const Instances = composeComponent(
     return (
       <div className={ classes.root }>
         { display }
-        <Button fab primary className={ classes.addButton } onClick={ createInstance }>
+        <Button fab color='primary' className={ classes.addButton } onClick={ createInstance }>
           <AddIcon />
         </Button>
       </div>

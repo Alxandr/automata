@@ -16,6 +16,7 @@ import { submitFilter } from '@shared/window/filters';
 const gameDirName = (() => {
   switch (osName) {
     case 'osx': return 'factorio.app';
+    case 'win': return 'factorio';
     default: throw new Error('not implemented');
   }
 })();
@@ -92,16 +93,21 @@ function* createInstance({ meta: { window } = {} }) {
     const instanceDir = getAppDir('instances', slug);
 
     // Step 2: Copy game
+    console.log(`Make link at ${instanceDir} pointing to ${version.path}`);
     yield call(linkVersion, version.path, instanceDir);
 
     // Step 3: Write config file
     const confPath = pathJoin(instanceDir, 'config.ini');
     const dataPath = pathJoin(instanceDir, 'data');
     const conf =
-  `
-  [path]
-  write-data=${dataPath}
-  `;
+`
+; version=2
+; This is INI file: https://en.wikipedia.org/wiki/INI_file#Format
+; Semicolons (;) at the beginning of the line indicate a comment. Comment lines are ignored.
+[path]
+read-data=__PATH__system-read-data__
+write-data=${dataPath}
+`;
     yield call(write, confPath, conf);
 
     // Step 4: Insert into database
@@ -111,7 +117,7 @@ function* createInstance({ meta: { window } = {} }) {
       dir: instanceDir,
       gameVersion: version.name,
       mods: [],
-      version: null
+      instanceVersion: null
     };
     yield call(insert, `instances/${slug}`, doc);
     yield call(fetchLocal);
@@ -152,7 +158,7 @@ function* fetchLocal() {
 
 function* runThenUpdate(dir) {
   yield call(startGame, dir);
-  yield call (fetchLocal);
+  yield call(fetchLocal);
 }
 
 function* start({ payload: instanceId }) {

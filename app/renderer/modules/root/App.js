@@ -5,6 +5,7 @@ import AppContent from './components/appcontent';
 import AppFrame from '@components/appframe';
 import Instance from './components/instance';
 import Instances from './components/instances';
+import PageInfo from './components/pageinfo';
 import React from 'react';
 import Versions from './components/versions';
 
@@ -17,7 +18,9 @@ const tabs = [
 
 const App = () => (
   <AppFrame>
-    <AppBar title='Automata' tabs={ tabs } />
+    <PageInfo title='Automata'>{({ title }) =>
+      <AppBar title={ title } tabs={ tabs } />
+    }</PageInfo>
 
     <AppContent>
       <Switch>

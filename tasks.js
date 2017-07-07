@@ -16,9 +16,16 @@ const delay = (timeout) => () => new Promise(resolve => setTimeout(resolve, time
 
 const spawn = (bin, ...args) => () => new Promise((resolve, reject) => {
   switch (platform()) {
+    case 'win32':
+      bin = path.join(__dirname, 'node_modules', '.bin', 'electron.cmd');
+      args.unshift('/c', bin);
+      bin = 'cmd';
+      break;
     default:
       bin = path.join(__dirname, 'node_modules', '.bin', bin);
+      break;
   }
+  console.log(`${bin} ${args.map(a => `'${a}'`).join(' ')}`);
   const proc = spawnChild(bin, args, {
     detached: false,
     //stdio: [ 'pipe', 'pipe', 'pipe' ]
@@ -40,7 +47,7 @@ export const devServer = () => start(
 export const startHot = () => start(
   env('HOT', '1'),
   delay(5000),
-  spawn('electron', '--enable-logging', '-r', 'babel-register', '-r', 'babel-polyfill', './app')
+  spawn('electron', '--enable-logging', '-r', 'babel-register', '-r', 'babel-polyfill', path.resolve('./app'))
 );
 
 export const dev = () => start(

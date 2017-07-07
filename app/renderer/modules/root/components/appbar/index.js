@@ -1,4 +1,4 @@
-import { Tab, Tabs } from 'material-ui/Tabs';
+import Tabs, { Tab } from 'material-ui/Tabs';
 import { goBack, reset as routerReset } from '@shared/router';
 import { matchPath, withRouter } from 'react-router';
 import { setDisplayName, setPropTypes } from 'recompose';
@@ -62,6 +62,9 @@ const mapDispatchToNavItemProps = (dispatch, { tabs }) => ({
 });
 
 const RootAppBar = composeComponent(
+  withStyleSheet(styleSheet),
+  connect(null, mapDispatchToNavItemProps),
+  withRouter,
   setDisplayName('RootAppBar'),
   setPropTypes({
     tabs: PropTypes.arrayOf(
@@ -74,9 +77,6 @@ const RootAppBar = composeComponent(
     ).isRequired,
     title: PropTypes.string.isRequired,
   }),
-  withStyleSheet(styleSheet),
-  connect(null, mapDispatchToNavItemProps),
-  withRouter,
   ({ classes, tabs, title, location, history, onTabChange, goBack }) => {
     let index = 0;
     for (; index < tabs.length; index++) {
@@ -95,19 +95,20 @@ const RootAppBar = composeComponent(
     return (
       <AppBar>
         <Toolbar>
-          <IconButton contrast
+          <IconButton
+            color='contrast'
             className={ classNames(classes.backButton, { [classes.backButtonHidden]: history.index === 0 }) }
             onClick={ goBack }>
             <ArrowBack />
           </IconButton>
-          <Text type='title' colorInherit className={ classes.flex }>{ title }</Text>
+          <Text type='title' color='inherit' className={ classes.flex }>{ title }</Text>
           <Tabs index={ index } onChange={ onTabChange } className={ classes.tabs }>
             { tabComps }
           </Tabs>
         </Toolbar>
       </AppBar>
     );
-  }
+  },
 );
 
 export default RootAppBar;

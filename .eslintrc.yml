@@ -57,3 +57,5 @@ rules:
   computed-property-spacing:
     - error
     - never
+  react/jsx-sort-prop-types:
+    - off

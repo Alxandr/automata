@@ -16,11 +16,11 @@ export default merge(baseConfig, {
   entry: [
     // bundle the client for webpack-dev-server
     // and connect to the provided endpoint
-    `webpack-dev-server/client?http://localhost:${port}`,
+    // `webpack-dev-server/client?http://localhost:${port}`,
 
     // bundle the client for hot reloading
     // only- means to only hot reload for successful updates
-    'webpack/hot/only-dev-server',
+    // 'webpack/hot/only-dev-server',
 
     // polyfills
     'babel-polyfill',
@@ -35,7 +35,7 @@ export default merge(baseConfig, {
 
   plugins: [
     // https://webpack.github.io/docs/hot-module-replacement-with-webpack.html
-    new webpack.HotModuleReplacementPlugin(),
+    // new webpack.HotModuleReplacementPlugin(),
 
     // Emit module names?
     new webpack.NamedModulesPlugin(),

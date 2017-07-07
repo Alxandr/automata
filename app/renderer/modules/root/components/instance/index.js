@@ -3,6 +3,7 @@ import { fetchLocalInstances, instancesSelector, start } from '@shared/instances
 import { setDisplayName, setPropTypes } from 'recompose';
 
 import Button from 'material-ui/Button';
+import PageInfo from '../pageinfo';
 import PlayArrowIcon from 'material-ui-icons/PlayArrow';
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -38,6 +39,9 @@ const mapDispatchToProps = (dispatch, props) => ({
 });
 
 const Instance = composeComponent(
+  connect(mapStateToProps, mapDispatchToProps),
+  onMounted(({ fetchLocal }) => fetchLocal()),
+  withStyleSheet(styleSheet),
   setDisplayName('Instance'),
   setPropTypes({
     match: PropTypes.shape({
@@ -46,15 +50,13 @@ const Instance = composeComponent(
       }).isRequired
     }).isRequired
   }),
-  connect(mapStateToProps, mapDispatchToProps),
-  onMounted(({ fetchLocal }) => fetchLocal()),
-  withStyleSheet(styleSheet),
   ({ classes, instance, start }) => {
     if (instance === null) return null;
 
     return (
       <div className={ classes.root }>
-        <Button fab primary className={ classes.startButton } onClick={ start }>
+        <PageInfo title={ instance.name } />
+        <Button fab color='primary' className={ classes.startButton } onClick={ start }>
           <PlayArrowIcon />
         </Button>
       </div>

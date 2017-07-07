@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
+import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import { allVersionsSelected, download, fetchLocalVersions, localVersionsLoadedSelector, localVersionsSelector, select, selectAll } from '@shared/versions';
 import { composeComponent, onMounted } from '@renderer/utils';
 import { setDisplayName, setPropTypes } from 'recompose';
@@ -16,7 +16,7 @@ import { withStyleSheet } from '@styles/styled';
 
 const versionPropType = PropTypes.shape({
   name: PropTypes.string.isRequired,
-  selected: PropTypes.bool.isRequired
+  selected: PropTypes.bool.isRequired,
 });
 
 const styleSheet = createStyleSheet('Versions', theme => ({
@@ -36,11 +36,11 @@ const mapDispatchToVersionRowProps = (dispatch, { version: { name } }) => ({
 });
 
 const VersionRow = composeComponent(
+  connect(null, mapDispatchToVersionRowProps),
   setDisplayName('VersionRow'),
   setPropTypes({
-    version: versionPropType
+    version: versionPropType,
   }),
-  connect(null, mapDispatchToVersionRowProps),
   ({ version: { name, selected }, select }) => (
     <TableRow hover role='checkbox' aria-checked={ false } tabIndex='-1' selected={ selected } onClick={ select }>
       <TableCell checkbox>
@@ -60,13 +60,13 @@ const mapDispatchToShowVersionProps = {
 };
 
 const ShowVersions = composeComponent(
+  connect(mapStateToShowVersionProps, mapDispatchToShowVersionProps),
   setDisplayName('ShowVersions'),
   setPropTypes({
     versions: PropTypes.arrayOf(
       versionPropType.isRequired
     ).isRequired
   }),
-  connect(mapStateToShowVersionProps, mapDispatchToShowVersionProps),
   ({ versions, allSelected, selectAll }) => {
     const rows = versions.map(v => <VersionRow key={ v.name } version={ v } />);
 
@@ -114,7 +114,7 @@ const Versions = composeComponent(
     return (
       <div className={ classes.root }>
         { display }
-        <Button fab primary className={ classes.addButton } onClick={ download }>
+        <Button fab color='primary' className={ classes.addButton } onClick={ download }>
           <AddIcon />
         </Button>
       </div>
