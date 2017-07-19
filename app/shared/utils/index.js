@@ -1,6 +1,7 @@
 import slug from 'slug';
 
 slug.defaults.modes.pretty.lower = true;
+slug.defaults.modes.pretty.remove = null;
 
 export { slug };
 export { default as perWindow } from './perWindow';

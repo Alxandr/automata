@@ -33,9 +33,15 @@ const installExtensions = async () => {
 async function start() {
   await installExtensions();
 
-  require('./store');
+  const { done } = require('./store');
+  await done;
 }
 
 app.on('ready', () => {
-  start().catch(err => dialog.showErrorBox('There\'s been an error', err.stack));
+  start()
+    .catch(err => dialog.showErrorBox('There\'s been an error', err.stack))
+    .then(() => {
+      console.log('Exiting application'); // eslint-disable-line no-console
+      app.quit();
+    });
 });

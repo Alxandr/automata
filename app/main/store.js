@@ -50,8 +50,9 @@ export const store = createStore(
     getFromRenderers,
     sagaMiddleware,
     logger,
-    forwardToRenderers
-  )
+    forwardToRenderers,
+  ),
 );
 
-sagaMiddleware.run(saga);
+const task = sagaMiddleware.run(saga);
+export const done = task.done;

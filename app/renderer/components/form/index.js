@@ -1,15 +1,38 @@
-import { LabelSwitch, Switch as MUISwitch } from 'material-ui/Switch';
 import { defaultProps, setDisplayName, setPropTypes } from 'recompose';
 
 import { Field } from 'redux-form';
 import FormControl from 'material-ui/Form/FormControl';
+import { FormControlLabel } from 'material-ui/Form'
 import Input from 'material-ui/Input/Input';
 import InputLabel from 'material-ui/Input/InputLabel';
-import { LabelCheckbox } from 'material-ui/Checkbox';
+import MUICheckbox from 'material-ui/Checkbox';
+//import MUISelectField from 'material-ui/SelectField';
+import MUISwitch from 'material-ui/Switch';
 import MUITextField from 'material-ui/TextField';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { composeComponent } from '@renderer/utils';
+
+const ActualSelect = children => ({
+  className,
+  disabled,
+  name,
+  onBlur,
+  onChange,
+  onFocus,
+  value
+}) => (
+  <select
+    className={ className }
+    disabled={ disabled }
+    name={ name }
+    onBlur={ onBlur }
+    onChange={ onChange }
+    onFocus={ onFocus }
+    value={ value }>
+    {children}
+  </select>
+);
 
 // TODO: Use from MUI when implemented
 const MUISelectField = ({
@@ -24,6 +47,7 @@ const MUISelectField = ({
   required,
   options,
   value,
+  fullWidth,
   ...other
 }) => (
     <FormControl className={ className } error={ error } required={ required } {...other}>
@@ -32,11 +56,15 @@ const MUISelectField = ({
           {label}
         </InputLabel>
       )}
-      <Input component='select' className={ inputClassName } value={ value } name={ name } disabled={ disabled } { ...inputProps }>
-        { options.map(v => <option value={ v.value } key={ v.name }>{ v.name }</option>) }
-      </Input>
+      <Input
+        component={ ActualSelect(options.map(v => <option value={ v.value } key={ v.name }>{ v.name }</option>)) }
+        className={ inputClassName }
+        value={ value }
+        name={ name }
+        disabled={ disabled }
+        { ...inputProps } />
     </FormControl>
-  );
+    );
 
 const TextFieldComponent = composeComponent(
   setDisplayName('TextFieldComponent'),
@@ -47,8 +75,8 @@ const TextFieldComponent = composeComponent(
   defaultProps({
     type: 'text'
   }),
-  ({ input, label, type, meta: { touched, error } }) => (
-    <MUITextField label={ label } error={ Boolean(touched && error) } { ...input } type={ type } />
+  ({ input, label, type, fullWidth, meta: { touched, error } }) => (
+    <MUITextField label={ label } error={ Boolean(touched && error) } { ...input } type={ type } fullWidth={ fullWidth } />
   )
 );
 
@@ -57,10 +85,11 @@ export const TextField = composeComponent(
   setPropTypes({
     type: PropTypes.string,
     name: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired
+    label: PropTypes.string.isRequired,
+    fullWidth: PropTypes.bool,
   }),
-  ({ type, name, label }) => (
-    <Field name={ name } component={ TextFieldComponent } label={ label } type={ type } />
+  ({ type, name, label, fullWidth }) => (
+    <Field name={ name } component={ TextFieldComponent } label={ label } type={ type } fullWidth={ fullWidth } />
   )
 );
 
@@ -68,10 +97,11 @@ const SelectComponent = composeComponent(
   setDisplayName('SelectComponent'),
   setPropTypes({
     options: PropTypes.array.isRequired,
-    label: PropTypes.string.isRequired
+    label: PropTypes.string.isRequired,
+    fullWidth: PropTypes.bool,
   }),
-  ({ input, label, options, meta: { touched, error } }) => (
-    <MUISelectField label={ label } error={ Boolean(touched && error) } { ...input } options={ options } />
+  ({ input, label, options, fullWidth, meta: { touched, error } }) => (
+    <MUISelectField label={ label } fullWidth={ fullWidth } error={ Boolean(touched && error) } { ...input } options={ options } />
   )
 );
 
@@ -80,10 +110,11 @@ export const Select = composeComponent(
   setPropTypes({
     options: PropTypes.array.isRequired,
     name: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired
+    label: PropTypes.string.isRequired,
+    fullWidth: PropTypes.bool,
   }),
-  ({ options, name, label }) => (
-    <Field name={ name } component={ SelectComponent } label={ label } options={ options } />
+  ({ options, name, label, fullWidth }) => (
+    <Field name={ name } component={ SelectComponent } label={ label } options={ options } fullWidth={ fullWidth } />
   )
 );
 
@@ -108,6 +139,8 @@ export const Checkbox = composeComponent(
   )
 );
 
+const LabelSwitch = ({ label, ...props }) => <FormControlLabel label={ label } component={ <MUISwitch { ...props } /> } />;
+
 const SwitchComponent = composeComponent(
   setDisplayName('SwitchComponent'),
   setPropTypes({
@@ -116,7 +149,7 @@ const SwitchComponent = composeComponent(
   }),
   ({ input, label, className }) => {
     const Comp = label ? LabelSwitch : MUISwitch;
-    const classProp = label ? { labelClassName: className } : { className };
+    const classProp = label ? { classes: { label: className } } : { className };
 
     return <Comp label={ label } checked={ input.value ? true : false } onChange={ input.onChange } { ...classProp } />;
   }

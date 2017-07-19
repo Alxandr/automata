@@ -13,8 +13,8 @@ const styleSheet = createStyleSheet('DialogForm', () => ({
 }));
 
 const DialogForm = composeComponent(
-  setDisplayName('DialogForm'),
   withStyleSheet(styleSheet),
+  setDisplayName('DialogForm'),
   ({ classes, ...props }) => (
     <form className={ classes.form } { ...props }></form>
   )

@@ -5,9 +5,11 @@ import { onlineVersionsSelector, showExperimentalSelector, toggleExperimental } 
 
 import Button from 'material-ui/Button';
 import DialogForm from '@components/form/DialogForm';
-import { LabelSwitch } from 'material-ui/Switch';
+import { FormControlLabel } from 'material-ui/Form'
+import Grid from 'material-ui/Grid';
 import React from 'react';
 import { Select } from '@components/form';
+import Switch from 'material-ui/Switch';
 import { cancel } from '@shared/window';
 import { connect } from 'react-redux';
 import { createStyleSheet } from 'jss-theme-reactor';
@@ -47,28 +49,33 @@ const mapDispatchToProps = {
 };
 
 const Window = composeComponent(
-  setDisplayName('DlFactorio'),
   withStyleSheet(styleSheet),
   connect(mapStateToProps, mapDispatchToProps),
   reduxSagaForm({
     form: 'download'
   }),
+  setDisplayName('DlFactorioWindow'),
   ({ versions, showExperimental, handleSubmit, classes, cancel, toggleExperimental, invalid, submitting }) => (
     <DialogForm onSubmit={ handleSubmit }>
       <DialogTitle>Download version</DialogTitle>
       <DialogContent>
-        <LabelSwitch label='Show experimental'
+      <FormControlLabel label='Show experimental' className={ classes.experimentalSwitch } control={
+        <Switch
           checked={ showExperimental }
-          labelClassName={ classes.experimentalSwitch }
           onChange={ toggleExperimental } />
-        <Select label='Version' name='version' options={ versions } />
+        } />
+        <Grid container gutter={0}>
+          <Grid item xs={12}>
+            <Select label='Version' name='version' options={ versions } fullWidth />
+          </Grid>
+        </Grid>
       </DialogContent>
       <DialogActions>
         <Button onClick={ cancel }>Cancel</Button>
-        <Button type='submit' primary disabled={ invalid || submitting }>Download</Button>
+        <Button type='submit' color='primary' disabled={ invalid || submitting }>Download</Button>
       </DialogActions>
     </DialogForm>
-  )
+  ),
 );
 
 export default Window;

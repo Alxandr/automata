@@ -29,6 +29,7 @@ rules:
   no-unused-vars:
     - error
     - argsIgnorePattern: ^_
+      varsIgnorePattern: ^_
   no-case-declarations: 0
   no-constant-condition:
     - error

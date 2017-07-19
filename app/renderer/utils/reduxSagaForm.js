@@ -1,6 +1,3 @@
-/* eslint-disable react/prop-types */
-import * as importedActions from 'redux-form/lib/actions';
-
 import { createEagerFactory, wrapDisplayName } from 'recompose';
 
 import { Component } from 'react';
@@ -13,6 +10,7 @@ import { createSelector } from 'reselect';
 import defaultShouldValidate from 'redux-form/lib/defaultShouldValidate';
 import { formStateSelector } from '@shared/window';
 import generateValidator from 'redux-form/lib/generateValidator';
+import importedActions from 'redux-form/lib/actions';
 import mapValues from 'lodash.mapvalues';
 import merge from 'lodash.merge';
 import structure from 'redux-form/lib/structure/plain';

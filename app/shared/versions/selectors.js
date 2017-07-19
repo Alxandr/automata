@@ -27,7 +27,9 @@ const _localVersionsSelector = compose(
 
 export const localVersionsSelector = createSelector(
   _localVersionsSelector,
-  versions => [...versions].sort((a, b) => 1 - versionCompare(parseVersion(a.name), parseVersion(b.name)))
+  versions => [...versions]
+    .filter(v => !v.virtual)
+    .sort((a, b) => 1 - versionCompare(parseVersion(a.name), parseVersion(b.name)))
 );
 
 export const allOnlineVersionsSelector = compose(

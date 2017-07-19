@@ -3,6 +3,7 @@ import { composeComponent, reduxSagaForm } from '@renderer/utils';
 
 import Button from 'material-ui/Button';
 import DialogForm from '@components/form/DialogForm';
+import Grid from 'material-ui/Grid';
 import React from 'react';
 import { TextField } from '@components/form';
 import { cancel } from '@shared/window';
@@ -27,25 +28,25 @@ const mapDispatchToProps = {
 };
 
 const LoginWindow = composeComponent(
-  setDisplayName('LoginWindow'),
   connect(null, mapDispatchToProps),
   reduxSagaForm({
     form: 'login',
     validate
   }),
+  setDisplayName('LoginWindow'),
   ({ cancel, handleSubmit, pristine, invalid, submitting }) => (
     <DialogForm onSubmit={ handleSubmit }>
       <DialogTitle>Factorio login</DialogTitle>
       <DialogContent>
-        <TextField label='Username' name='username' />
-        <TextField label='Password' name='password' type='password' />
+        <TextField label='Username' name='username' fullWidth />
+        <TextField label='Password' name='password' type='password' fullWidth />
       </DialogContent>
       <DialogActions>
         <Button onClick={ cancel }>Cancel</Button>
         <Button type='submit' primary disabled={ pristine || invalid || submitting }>Login</Button>
       </DialogActions>
     </DialogForm>
-  )
+  ),
 );
 
 export default LoginWindow;

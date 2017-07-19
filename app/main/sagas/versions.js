@@ -1,15 +1,17 @@
 import { DOWNLOAD, FETCH_LOCAL_VERSIONS, onlineVersionsSelector, setOnlineVersions, setVersions } from '@shared/versions';
 import { call, put, select, take, takeLatest } from 'redux-saga/effects';
-import { getAll, insert } from '../db';
+import { compareVersions, getGroupNames, getVersions } from '../factorio/versions';
+import { get, getAll, insert, update } from '../db';
 import { getAppDir, osName } from '../app';
 import { isLoggedInSelector, sessionSelector } from '@shared/login';
+import { link, unlink } from '../fs';
 import { lock, unlock } from '@shared/window/actions';
 
 import downloadFile from './downloadFile';
-import { getVersions } from '../factorio/versions';
 import { join as joinPath } from 'path';
 import login from './login';
 import modal from './modal';
+import { slug } from '@shared/utils';
 import { submitFilter } from '@shared/window/filters';
 import unpack from '../factorio/unpack';
 
@@ -79,21 +81,57 @@ function* browseFactorioVersions({ meta: { window } = {} }) {
     if (!selectedVersion) return;
 
     const { url, name } = selectedVersion;
+    const nameSlug = slug(name);
     const dlDir = getAppDir('download', 'versions');
     const filePath = joinPath(dlDir, name + ext);
     yield call(downloadFile, window, `https://www.factorio.com${url}`, filePath, session);
 
-    const versionDir = getAppDir('versions', name);
-    const appPath = yield call(unpack, filePath, versionDir);
-    yield call(addLocal, name, appPath);
+    const versionDir = getAppDir('versions', nameSlug);
+    yield call(unpack, filePath, versionDir);
+    yield call(addLocal, name, versionDir, nameSlug);
   } finally {
     yield put(unlock(window));
   }
 }
 
-function* addLocal(name, path) {
-  yield call(insert, `versions/${name}`, { name, path });
+function* assertVirtualVersions(versionSlug) {
+  const version = yield call(get, `versions/${versionSlug}`);
+  if (!version) return;
+
+  for (const { name, slug } of getGroupNames(version.name)) {
+    const virtVersion = yield call(get, `versions/${slug}`);
+    if (!virtVersion) {
+      // Virtual version does not exist.
+      // Create it and point it at current version.
+      yield call(addVirtual, name, slug, version);
+      continue;
+    }
+
+    const { target: targetSlug } = virtVersion;
+    const target = yield call(get, `versions/${targetSlug}`);
+    if (compareVersions(version.name, target.name) > 0) {
+      yield call(updateVirtual, virtVersion, version);
+    }
+  }
+}
+
+function* addLocal(name, path, slug) {
+  yield call(insert, `versions/${slug}`, { name, path, slug, virtual: false });
+  yield call(assertVirtualVersions, slug);
   yield call(fetchLocal);
+}
+
+function* addVirtual(name, slug, version) {
+  const versionsDir = getAppDir('versions');
+  const path = joinPath(versionsDir, slug);
+  yield call(link, path, version.path);
+  yield call(insert, `versions/${slug}`, { name, path, slug, virtual: true, target: version.slug });
+}
+
+function* updateVirtual(version, target) {
+  yield call(unlink, version.path);
+  yield call(link, version.path, target.path);
+  yield call(update, { ...version, target: target.slug });
 }
 
 export function* getLocal() {

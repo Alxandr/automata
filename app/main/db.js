@@ -31,9 +31,14 @@ const db = (() => {
 })();
 
 export const get = async (id) => {
-  const result = await db.get(id);
+  try {
+    const result = await db.get(id);
 
-  return result;
+    return result;
+  } catch (e) {
+    if (e.status === 404) return null;
+    throw e;
+  }
 };
 
 export const getAll = async (type) => {
@@ -51,6 +56,12 @@ export const insert = async (id, doc) => {
     ...doc,
     _id: id
   });
+
+  return { id: result.id, rev: result.rev };
+};
+
+export const update = async doc => {
+  const result = await db.put(doc);
 
   return { id: result.id, rev: result.rev };
 };

@@ -59,3 +59,10 @@ export const link = async (linkLocation, linkTarget) => {
     });
   });
 };
+
+export const unlink = (linkLocation) => new Promise((res, rej) => {
+  fs.unlink(linkLocation, (err) => {
+    if (err) rej(err);
+    else res();
+  });
+});
