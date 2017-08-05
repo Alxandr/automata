@@ -1,6 +1,11 @@
 import Card, { CardContent, CardMedia } from 'material-ui/Card';
 import { composeComponent, onMounted } from '@renderer/utils';
-import { createInstance, fetchLocalInstances, instancesSelector, start } from '@shared/instances';
+import {
+  createInstance,
+  fetchLocalInstances,
+  instancesSelector,
+  start,
+} from '@shared/instances';
 import { setDisplayName, setPropTypes } from 'recompose';
 
 import AddIcon from 'material-ui-icons/Add';
@@ -12,30 +17,30 @@ import React from 'react';
 import Text from 'material-ui/Typography';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { createStyleSheet } from 'jss-theme-reactor';
+import { createStyleSheet } from 'material-ui/styles';
 import { push as routerPush } from '@shared/router';
-import { withStyleSheet } from '@styles/styled';
+import { withStyles } from '@styles/styled';
 
-const styleSheet = createStyleSheet('Instances', theme => ({
+const styles = createStyleSheet('Instances', theme => ({
   root: {
-    display: 'flex'
+    display: 'flex',
   },
 
   addButton: {
     position: 'fixed',
     right: theme.spacing.unit * 3,
-    bottom: theme.spacing.unit * 3
+    bottom: theme.spacing.unit * 3,
   },
 
   card: {
     width: 200,
     margin: 10,
-    flex: 'none'
+    flex: 'none',
   },
 
   cardMedia: {
     width: 200,
-    height: 200
+    height: 200,
   },
 
   overlay: {
@@ -52,8 +57,8 @@ const styleSheet = createStyleSheet('Instances', theme => ({
     justifyContent: 'center',
 
     '&:hover': {
-      opacity: 1
-    }
+      opacity: 1,
+    },
   },
 
   playIcon: {
@@ -70,75 +75,85 @@ const styleSheet = createStyleSheet('Instances', theme => ({
     backgroundColor: 'rgba(255, 255, 255, 0)',
 
     '&:hover': {
-      backgroundColor: 'rgba(255, 255, 255, .4)'
-    }
+      backgroundColor: 'rgba(255, 255, 255, .4)',
+    },
   },
 
   instances: {
     display: 'flex',
     width: '100%',
     height: '100%',
-    flexWrap: 'wrap'
-  }
+    flexWrap: 'wrap',
+  },
 }));
 
 const instanceShape = {
   name: PropTypes.string.isRequired,
   version: PropTypes.string,
   icon: PropTypes.string,
-  numSaves: PropTypes.number.isRequired
+  numSaves: PropTypes.number.isRequired,
 };
 
 const mapInstanceDispatchToProps = (dispatch, props) => ({
-  start: (evt) => {
+  start: evt => {
     evt.stopPropagation();
     dispatch(start(props._id));
   },
   // id is `instances/instance-slug`, thus I don't need to add that.
-  view: () => dispatch(routerPush(`/${props._id}`))
+  view: () => dispatch(routerPush(`/${props._id}`)),
 });
 
 const Instance = composeComponent(
   connect(null, mapInstanceDispatchToProps),
-  withStyleSheet(styleSheet),
+  withStyles(styles),
   setDisplayName('Instance'),
   setPropTypes(instanceShape),
-  ({ classes, name, icon, start, numSaves, mods, view }) => (
-    <Card className={ classes.card } onClick={ view }>
-      <CardMedia className={ classes.cardMedia }>
-        <img src={ icon || 'images/factorio.png' } />
-        <div className={ classes.overlay }>
-          <IconButton onClick={ start } className={ classes.overlayButton }>
-            <PlayArrowIcon className={ classes.playIcon } />
+  ({ classes, name, icon, start, numSaves, mods, view }) =>
+    <Card className={classes.card} onClick={view}>
+      <CardMedia className={classes.cardMedia}>
+        <img src={icon || 'images/factorio.png'} />
+        <div className={classes.overlay}>
+          <IconButton onClick={start} className={classes.overlayButton}>
+            <PlayArrowIcon className={classes.playIcon} />
           </IconButton>
         </div>
       </CardMedia>
       <CardContent>
-        <Text type="headline" component="h2">{ name }</Text>
-        <Text component="p">Number of mods: { mods.length }</Text>
-        <Text component="p">Number of saves: { numSaves }</Text>
+        <Text type="headline" component="h2">
+          {name}
+        </Text>
+        <Text component="p">
+          Number of mods: {mods.length}
+        </Text>
+        <Text component="p">
+          Number of saves: {numSaves}
+        </Text>
       </CardContent>
-    </Card>
-  )
+    </Card>,
 );
 
 const ShowInstances = composeComponent(
-  withStyleSheet(styleSheet),
+  withStyles(styles),
   setDisplayName('ShowInstances'),
   setPropTypes({
-    instances: PropTypes.arrayOf(
-      PropTypes.shape(instanceShape).isRequired
-    ).isRequired
+    instances: PropTypes.arrayOf(PropTypes.shape(instanceShape).isRequired)
+      .isRequired,
   }),
   ({ instances, classes }) => {
-    const instanceCards = instances.map(inst => <Instance { ...inst } key={ inst._id } />);
+    const instanceCards = instances.map(inst =>
+      <Instance {...inst} key={inst._id} />,
+    );
 
-    return <div className={ classes.instances }>{ instanceCards }</div>;
-  }
+    return (
+      <div className={classes.instances}>
+        {instanceCards}
+      </div>
+    );
+  },
 );
 
 const mapStateToProps = createStructuredSelector({
-  local: instancesSelector
+  local: instancesSelector,
 });
 
 const mapDispatchToProps = { fetchLocal: fetchLocalInstances, createInstance };
@@ -146,24 +161,28 @@ const mapDispatchToProps = { fetchLocal: fetchLocalInstances, createInstance };
 const Instances = composeComponent(
   connect(mapStateToProps, mapDispatchToProps),
   onMounted(({ fetchLocal }) => fetchLocal()),
-  withStyleSheet(styleSheet),
+  withStyles(styles),
   setDisplayName('Instances'),
   ({ classes, local, createInstance }) => {
-    const display = local.length > 0 ? (
-      <ShowInstances instances={local} />
-    ) : (
-      <Text type='headline'>No instances configured.</Text>
-    );
+    const display =
+      local.length > 0
+        ? <ShowInstances instances={local} />
+        : <Text type="headline">No instances configured.</Text>;
 
     return (
-      <div className={ classes.root }>
-        { display }
-        <Button fab color='primary' className={ classes.addButton } onClick={ createInstance }>
+      <div className={classes.root}>
+        {display}
+        <Button
+          fab
+          color="primary"
+          className={classes.addButton}
+          onClick={createInstance}
+        >
           <AddIcon />
         </Button>
       </div>
     );
-  }
+  },
 );
 
 export default Instances;

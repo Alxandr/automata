@@ -1,12 +1,12 @@
 import { setDisplayName, setPropTypes } from 'recompose';
-import { withClasses, withStyleSheet } from '@styles/styled';
+import { withClasses, withStyles } from '@styles/styled';
 
 import PropTypes from 'prop-types';
 import React from 'react';
 import { composeComponent } from '@renderer/utils';
-import { createStyleSheet } from 'jss-theme-reactor';
+import { createStyleSheet } from 'material-ui/styles';
 
-const styleSheet = createStyleSheet('AppFrame', theme => ({
+const styles = createStyleSheet('AppFrame', theme => ({
   '@global': {
     html: {
       boxSizing: 'border-box',
@@ -40,7 +40,7 @@ const styleSheet = createStyleSheet('AppFrame', theme => ({
       maxWidth: '100%',
       height: 'auto',
       width: 'auto',
-    }
+    },
   },
 
   appFrame: {
@@ -48,18 +48,21 @@ const styleSheet = createStyleSheet('AppFrame', theme => ({
     alignItems: 'stretch',
     minHeight: '100vh',
     width: '100%',
-  }
+  },
 }));
 
 const AppFrame = composeComponent(
+  withStyles(styles),
+  withClasses('appFrame'),
   setDisplayName('AppFrame'),
   setPropTypes({
     className: PropTypes.string,
-    children: PropTypes.node.isRequired
+    children: PropTypes.node.isRequired,
   }),
-  withStyleSheet(styleSheet),
-  withClasses('appFrame'),
-  ({ className, children }) => <div className={className} children={children} />
+  ({ className, children }) =>
+    <div className={className}>
+      {children}
+    </div>,
 );
 
 export default AppFrame;

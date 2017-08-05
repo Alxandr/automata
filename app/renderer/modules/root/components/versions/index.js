@@ -1,5 +1,18 @@
-import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
-import { allVersionsSelected, download, fetchLocalVersions, localVersionsLoadedSelector, localVersionsSelector, select, selectAll } from '@shared/versions';
+import Table, {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from 'material-ui/Table';
+import {
+  allVersionsSelected,
+  download,
+  fetchLocalVersions,
+  localVersionsLoadedSelector,
+  localVersionsSelector,
+  select,
+  selectAll,
+} from '@shared/versions';
 import { composeComponent, onMounted } from '@renderer/utils';
 import { setDisplayName, setPropTypes } from 'recompose';
 
@@ -11,28 +24,28 @@ import React from 'react';
 import Text from 'material-ui/Typography';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { createStyleSheet } from 'jss-theme-reactor';
-import { withStyleSheet } from '@styles/styled';
+import { createStyleSheet } from 'material-ui/styles';
+import { withStyles } from '@styles/styled';
 
 const versionPropType = PropTypes.shape({
   name: PropTypes.string.isRequired,
   selected: PropTypes.bool.isRequired,
 });
 
-const styleSheet = createStyleSheet('Versions', theme => ({
+const styles = createStyleSheet('Versions', theme => ({
   root: {
-    display: 'flex'
+    display: 'flex',
   },
 
   addButton: {
     position: 'fixed',
     right: theme.spacing.unit * 3,
-    bottom: theme.spacing.unit * 3
-  }
+    bottom: theme.spacing.unit * 3,
+  },
 }));
 
 const mapDispatchToVersionRowProps = (dispatch, { version: { name } }) => ({
-  select: () => dispatch(select(name))
+  select: () => dispatch(select(name)),
 });
 
 const VersionRow = composeComponent(
@@ -41,56 +54,62 @@ const VersionRow = composeComponent(
   setPropTypes({
     version: versionPropType,
   }),
-  ({ version: { name, selected }, select }) => (
-    <TableRow hover role='checkbox' aria-checked={ false } tabIndex='-1' selected={ selected } onClick={ select }>
+  ({ version: { name, selected }, select }) =>
+    <TableRow
+      hover
+      role="checkbox"
+      aria-checked={false}
+      tabIndex="-1"
+      selected={selected}
+      onClick={select}
+    >
       <TableCell checkbox>
-        <Checkbox checked={ selected } />
+        <Checkbox checked={selected} />
       </TableCell>
-      <TableCell disablePadding>{ name }</TableCell>
-    </TableRow>
-  )
+      <TableCell disablePadding>
+        {name}
+      </TableCell>
+    </TableRow>,
 );
 
 const mapStateToShowVersionProps = createStructuredSelector({
-  allSelected: allVersionsSelected
+  allSelected: allVersionsSelected,
 });
 
 const mapDispatchToShowVersionProps = {
-  selectAll
+  selectAll,
 };
 
 const ShowVersions = composeComponent(
   connect(mapStateToShowVersionProps, mapDispatchToShowVersionProps),
   setDisplayName('ShowVersions'),
   setPropTypes({
-    versions: PropTypes.arrayOf(
-      versionPropType.isRequired
-    ).isRequired
+    versions: PropTypes.arrayOf(versionPropType.isRequired).isRequired,
   }),
   ({ versions, allSelected, selectAll }) => {
-    const rows = versions.map(v => <VersionRow key={ v.name } version={ v } />);
+    const rows = versions.map(v => <VersionRow key={v.name} version={v} />);
 
     return (
       <Table>
         <TableHead>
           <TableRow>
             <TableCell checkbox>
-              <Checkbox checked={ allSelected } onChange={ selectAll } />
+              <Checkbox checked={allSelected} onChange={selectAll} />
             </TableCell>
             <TableCell disablePadding>Version</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          { rows }
+          {rows}
         </TableBody>
       </Table>
     );
-  }
+  },
 );
 
 const mapStateToProps = createStructuredSelector({
   local: localVersionsSelector,
-  loaded: localVersionsLoadedSelector
+  loaded: localVersionsLoadedSelector,
 });
 
 const mapDispatchToProps = { fetchLocal: fetchLocalVersions, download };
@@ -99,27 +118,31 @@ const Versions = composeComponent(
   setDisplayName('Versions'),
   connect(mapStateToProps, mapDispatchToProps),
   onMounted(({ fetchLocal }) => fetchLocal()),
-  withStyleSheet(styleSheet),
+  withStyles(styles),
   ({ classes, local, download, loaded }) => {
     if (!loaded) {
       return null;
     }
 
-    const display = local.length > 0 ? (
-      <ShowVersions versions={local} />
-    ) : (
-      <Text type='headline'>No factorio versions installed.</Text>
-    );
+    const display =
+      local.length > 0
+        ? <ShowVersions versions={local} />
+        : <Text type="headline">No factorio versions installed.</Text>;
 
     return (
-      <div className={ classes.root }>
-        { display }
-        <Button fab color='primary' className={ classes.addButton } onClick={ download }>
+      <div className={classes.root}>
+        {display}
+        <Button
+          fab
+          color="primary"
+          className={classes.addButton}
+          onClick={download}
+        >
           <AddIcon />
         </Button>
       </div>
     );
-  }
+  },
 );
 
 export default Versions;

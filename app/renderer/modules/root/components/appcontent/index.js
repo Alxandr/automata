@@ -1,12 +1,12 @@
 import { setDisplayName, setPropTypes } from 'recompose';
-import { withClasses, withStyleSheet } from '@styles/styled';
+import { withClasses, withStyles } from '@styles/styled';
 
 import PropTypes from 'prop-types';
 import React from 'react';
 import { composeComponent } from '@renderer/utils';
-import { createStyleSheet } from 'jss-theme-reactor';
+import { createStyleSheet } from 'material-ui/styles';
 
-const styleSheet = createStyleSheet('AppContent', theme => ({
+const styles = createStyleSheet('AppContent', theme => ({
   content: theme.mixins.gutters({
     paddingTop: 80,
     flex: '1 1 100%',
@@ -17,19 +17,22 @@ const styleSheet = createStyleSheet('AppContent', theme => ({
   [theme.breakpoints.up(948)]: {
     content: {
       maxWidth: 900,
-    }
-  }
+    },
+  },
 }));
 
 const AppContent = composeComponent(
+  withStyles(styles),
+  withClasses('content'),
   setDisplayName('AppContent'),
   setPropTypes({
     children: PropTypes.node.isRequired,
-    className: PropTypes.string
+    className: PropTypes.string,
   }),
-  withStyleSheet(styleSheet),
-  withClasses('content'),
-  ({ className, children }) => <div className={ className } children={ children } />
+  ({ className, children }) =>
+    <div className={className}>
+      {children}
+    </div>,
 );
 
 export default AppContent;

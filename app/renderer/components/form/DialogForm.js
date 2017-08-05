@@ -1,23 +1,21 @@
 import React from 'react';
 import { composeComponent } from '@renderer/utils';
-import { createStyleSheet } from 'jss-theme-reactor';
+import { createStyleSheet } from 'material-ui/styles';
 import { setDisplayName } from 'recompose';
-import { withStyleSheet } from '@styles/styled';
+import { withStyles } from '@styles/styled';
 
-const styleSheet = createStyleSheet('DialogForm', () => ({
+const styles = createStyleSheet('DialogForm', () => ({
   form: {
     display: 'flex',
     flexDirection: 'column',
-    width: '100%'
-  }
+    width: '100%',
+  },
 }));
 
 const DialogForm = composeComponent(
-  withStyleSheet(styleSheet),
+  withStyles(styles),
   setDisplayName('DialogForm'),
-  ({ classes, ...props }) => (
-    <form className={ classes.form } { ...props }></form>
-  )
+  ({ classes, ...props }) => <form className={classes.form} {...props} />,
 );
 
 export default DialogForm;

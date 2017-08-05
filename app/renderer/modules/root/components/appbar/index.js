@@ -13,43 +13,35 @@ import Toolbar from 'material-ui/Toolbar';
 import classNames from 'classnames';
 import { composeComponent } from '@renderer/utils';
 import { connect } from 'react-redux';
-import { createStyleSheet } from 'jss-theme-reactor';
-import { withStyleSheet } from '@styles/styled';
+import { createStyleSheet } from 'material-ui/styles';
+import { withStyles } from '@styles/styled';
 
-const styleSheet = createStyleSheet('RootAppBar', () => ({
+const styles = createStyleSheet('RootAppBar', () => ({
   flex: {
-    flex: 1
+    flex: 1,
   },
 
   tabs: {
+    alignSelf: 'stretch',
+  },
+
+  tabsFlexContainer: {
     height: '100%',
-
-    '& > div': {
-      height: '100%',
-
-      '& > div': {
-        height: '100%',
-
-        '& > div:first-child': {
-          height: '100%',
-          alignItems: 'center',
-        },
-      },
-    },
   },
 
   tab: {
-    height: '100%',
+    height: 'auto',
+    alignSelf: 'stretch',
   },
 
   backButton: {
     transition: 'width .5s, margin-left .5s',
-    marginLeft: -12
+    marginLeft: -12,
   },
   backButtonHidden: {
     width: 0,
-    marginLeft: 0
-  }
+    marginLeft: 0,
+  },
 }));
 
 const mapDispatchToNavItemProps = (dispatch, { tabs }) => ({
@@ -58,11 +50,11 @@ const mapDispatchToNavItemProps = (dispatch, { tabs }) => ({
     return dispatch(routerReset(tab.path));
   },
 
-  goBack: () => dispatch(goBack())
+  goBack: () => dispatch(goBack()),
 });
 
 const RootAppBar = composeComponent(
-  withStyleSheet(styleSheet),
+  withStyles(styles),
   connect(null, mapDispatchToNavItemProps),
   withRouter,
   setDisplayName('RootAppBar'),
@@ -72,8 +64,8 @@ const RootAppBar = composeComponent(
         path: PropTypes.string.isRequired,
         exact: PropTypes.bool,
         label: PropTypes.string.isRequired,
-        replace: PropTypes.bool
-      }).isRequired
+        replace: PropTypes.bool,
+      }).isRequired,
     ).isRequired,
     title: PropTypes.string.isRequired,
   }),
@@ -90,20 +82,34 @@ const RootAppBar = composeComponent(
       index = 0;
     }
 
-    const tabComps = tabs.map(({ label }) => <Tab label={ label } key={ label } className={ classes.tab } />);
+    const tabComps = tabs.map(({ label }) =>
+      <Tab label={label} key={label} className={classes.tab} />,
+    );
 
     return (
       <AppBar>
         <Toolbar>
           <IconButton
-            color='contrast'
-            className={ classNames(classes.backButton, { [classes.backButtonHidden]: history.index === 0 }) }
-            onClick={ goBack }>
+            color="contrast"
+            className={classNames(classes.backButton, {
+              [classes.backButtonHidden]: history.index === 0,
+            })}
+            onClick={goBack}
+          >
             <ArrowBack />
           </IconButton>
-          <Text type='title' color='inherit' className={ classes.flex }>{ title }</Text>
-          <Tabs index={ index } onChange={ onTabChange } className={ classes.tabs }>
-            { tabComps }
+          <Text type="title" color="inherit" className={classes.flex}>
+            {title}
+          </Text>
+          <Tabs
+            index={index}
+            onChange={onTabChange}
+            classes={{
+              root: classes.tabs,
+              flexContainer: classes.tabsFlexContainer,
+            }}
+          >
+            {tabComps}
           </Tabs>
         </Toolbar>
       </AppBar>

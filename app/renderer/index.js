@@ -1,15 +1,18 @@
-import MuiThemeProvider, { MUI_SHEET_ORDER } from 'material-ui/styles/MuiThemeProvider';
+import {
+  MuiThemeProvider,
+  createStyleSheet,
+  withStyles,
+} from 'material-ui/styles';
 import React, { Component } from 'react';
-import { blue, pink } from 'material-ui/colors';
 import { composeComponent, onMounted } from '@renderer/utils';
 
 import AppFrame from '@components/appframe';
+import { JssProvider } from 'react-jss';
 import PropTypes from 'prop-types';
 import { Provider } from 'react-redux';
 import ReactDOM from 'react-dom';
 import Router from '@components/Router';
-import createMuiTheme from 'material-ui/styles/theme';
-import createPalette from 'material-ui/styles/palette';
+import createContext from './styles/create-context';
 import { ipcRenderer } from 'electron';
 import { setDisplayName } from 'recompose';
 import { setId } from './windowid';
@@ -19,79 +22,79 @@ import { windowSelector } from '@shared/window';
 const windowId = ipcRenderer.sendSync('window-get-id');
 setId(windowId);
 
-/*const mapStateToProgressProps = createStructuredSelector({
-  locked: lockedSelector
-});
-const ConnectedProgressLock =
-  composeComponent(
-    connect(mapStateToProgressProps),
-    ProgressLock
-  );*/
+const context = createContext();
 
-// TODO: move to state.
-let styleManager = null;
+// Apply some reset
+const styles = createStyleSheet('Root', theme => ({
+  '@global': {
+    html: {
+      background: theme.palette.background.default,
+      WebkitFontSmoothing: 'antialiased', // Antialiasing.
+      MozOsxFontSmoothing: 'grayscale', // Antialiasing.
+    },
+    body: {
+      margin: 0,
+    },
+  },
+}));
+
 const App = composeComponent(
   setDisplayName('RootApp'),
   onMounted(() => ipcRenderer.send(`window-${windowId}-ready`)),
-  ({ children, dark }) => {
-    const palette = createPalette({
-      primary: blue,
-      accent: pink,
-      type: dark ? 'dark' : 'light',
-    });
-
-    const theme = createMuiTheme({ palette });
-
-    if (!styleManager) {
-      const themeContext = MuiThemeProvider.createDefaultContext({ theme });
-      styleManager = themeContext.styleManager;
-    } else {
-      styleManager.updateTheme(theme);
-    }
-
-    styleManager.setSheetOrder(MUI_SHEET_ORDER);
-
+  ({ children }) => {
     return (
-      <MuiThemeProvider theme={theme} styleManager={styleManager}>
-        <Router>
-          <AppFrame>
-            { children }
-            {/*<ConnectedProgressLock scale={3} />*/}
-          </AppFrame>
-        </Router>
-      </MuiThemeProvider>
+      <JssProvider registry={context.sheetsRegistry} jss={context.jss}>
+        <MuiThemeProvider
+          theme={context.theme}
+          sheetsManager={context.sheetsManager}
+        >
+          <Router>
+            <AppFrame>
+              {children}
+              {/*<ConnectedProgressLock scale={3} />*/}
+            </AppFrame>
+          </Router>
+        </MuiThemeProvider>
+      </JssProvider>
     );
-  }
+  },
 );
 
 App.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 };
 
 const moduleName = windowSelector(store.getState());
 const loadComponent = (() => {
   const getDefault = moduleExports => moduleExports.default;
   const err = e => {
-    const NotFound = () => (
+    const NotFound = () =>
       <div>
-        <h1>Module {moduleName} not found!</h1>
+        <h1>
+          Module {moduleName} not found!
+        </h1>
         <pre>
-          { e ? e.stack : 'Module not configured.' }
+          {e ? e.stack : 'Module not configured.'}
         </pre>
-      </div>
-    );
+      </div>;
 
     return NotFound;
   };
 
   switch (moduleName) {
-    case 'root': return System.import('./modules/root').then(getDefault).catch(err);
-    case 'login': return System.import('./modules/login').then(getDefault).catch(err);
-    case 'dl_factorio': return System.import('./modules/dl_factorio').then(getDefault).catch(err);
-    case 'new_inst': return System.import('./modules/new_inst').then(getDefault).catch(err);
-    default: return Promise.resolve(err(null));
+    case 'root':
+      return System.import('./modules/root').then(getDefault).catch(err);
+    case 'login':
+      return System.import('./modules/login').then(getDefault).catch(err);
+    case 'dl_factorio':
+      return System.import('./modules/dl_factorio').then(getDefault).catch(err);
+    case 'new_inst':
+      return System.import('./modules/new_inst').then(getDefault).catch(err);
+    default:
+      return Promise.resolve(err(null));
   }
 })();
+
 class Window extends Component {
   constructor() {
     super();
@@ -116,16 +119,22 @@ class Window extends Component {
   }
 }
 
-const Root = ({ children }) => (
+const StyledWindow = withStyles(styles)(Window);
+
+const Root = ({ children }) =>
   <Provider store={store}>
     <App>
-      { children }
+      {children}
     </App>
-  </Provider>
-);
+  </Provider>;
 Root.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 };
 
 const root = document.getElementById('root');
-ReactDOM.render(<Root><Window /></Root>, root);
+ReactDOM.render(
+  <Root>
+    <StyledWindow />
+  </Root>,
+  root,
+);
