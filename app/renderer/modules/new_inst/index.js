@@ -1,9 +1,18 @@
 import { DialogActions, DialogContent, DialogTitle } from 'material-ui/Dialog';
 import { Select, TextField } from '@components/form';
+import {
+  allLocalVersionsSelector,
+  fetchLocalVersions,
+  highestLocalVersionSelector,
+  localVersionsLoadedSelector,
+} from '@shared/versions';
 import { composeComponent, onMounted, reduxSagaForm } from '@renderer/utils';
 import { createSelector, createStructuredSelector } from 'reselect';
-import { fetchLocalInstances, instancesLoadedSelector, instancesSelector } from '@shared/instances';
-import { fetchLocalVersions, highestLocalVersionSelector, localVersionsLoadedSelector, localVersionsSelector } from '@shared/versions';
+import {
+  fetchLocalInstances,
+  instancesLoadedSelector,
+  instancesSelector,
+} from '@shared/instances';
 import { setDisplayName, setPropTypes } from 'recompose';
 
 import Button from 'material-ui/Button';
@@ -16,11 +25,15 @@ import { slug } from '@shared/utils';
 
 const mapStateToProps = createStructuredSelector({
   instances: instancesSelector,
-  versions: localVersionsSelector,
-  loaded: createSelector(instancesLoadedSelector, localVersionsLoadedSelector, (instLoaded, verLoaded) => instLoaded && verLoaded),
+  versions: allLocalVersionsSelector,
+  loaded: createSelector(
+    instancesLoadedSelector,
+    localVersionsLoadedSelector,
+    (instLoaded, verLoaded) => instLoaded && verLoaded,
+  ),
   initialValues: createStructuredSelector({
-    version: createSelector(highestLocalVersionSelector, v => v && v.name)
-  })
+    version: createSelector(highestLocalVersionSelector, v => v && v.name),
+  }),
 });
 const mapDispatchToProps = { fetchLocalVersions, fetchLocalInstances, cancel };
 
@@ -37,7 +50,7 @@ const FormLoader = composeComponent(
     }
 
     return <Form {...props} />;
-  }
+  },
 );
 
 const validate = ({ name = '' }, { instances }) => {
@@ -56,31 +69,41 @@ const validate = ({ name = '' }, { instances }) => {
 const Form = composeComponent(
   setDisplayName('InstancePrompt.Form'),
   setPropTypes({
-    instances: PropTypes.arrayOf(PropTypes.shape({ slug: PropTypes.string.isRequired }).isRequired).isRequired,
-    versions: PropTypes.arrayOf(PropTypes.shape({ name: PropTypes.string.isRequired }).isRequired).isRequired,
-    cancel: PropTypes.func.isRequired
+    instances: PropTypes.arrayOf(
+      PropTypes.shape({ slug: PropTypes.string.isRequired }).isRequired,
+    ).isRequired,
+    versions: PropTypes.arrayOf(
+      PropTypes.shape({ name: PropTypes.string.isRequired }).isRequired,
+    ).isRequired,
+    cancel: PropTypes.func.isRequired,
   }),
   reduxSagaForm({
     form: 'instance-prompt',
-    validate
+    validate,
   }),
   ({ handleSubmit, versions, cancel, invalid, submitting }) => {
     const versionsOptions = versions.map(({ name }) => ({ name, value: name }));
 
     return (
-      <DialogForm onSubmit={ handleSubmit }>
+      <DialogForm onSubmit={handleSubmit}>
         <DialogTitle>New Instance</DialogTitle>
         <DialogContent>
-          <TextField label='Instance name' name='name' />
-          <Select label='Factorio version' name='version' options={ versionsOptions } />
+          <TextField label="Instance name" name="name" />
+          <Select
+            label="Factorio version"
+            name="version"
+            options={versionsOptions}
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={ cancel }>Cancel</Button>
-          <Button type='submit' primary disabled={ invalid || submitting }>Create</Button>
+          <Button onClick={cancel}>Cancel</Button>
+          <Button type="submit" primary disabled={invalid || submitting}>
+            Create
+          </Button>
         </DialogActions>
       </DialogForm>
     );
-  }
+  },
 );
 
 export default FormLoader;

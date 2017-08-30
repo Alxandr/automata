@@ -1,16 +1,15 @@
 import React from 'react';
 import { composeComponent } from '@renderer/utils';
-import { createStyleSheet } from 'material-ui/styles';
 import { setDisplayName } from 'recompose';
 import { withStyles } from '@styles/styled';
 
-const styles = createStyleSheet('DialogForm', () => ({
+const styles = {
   form: {
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
   },
-}));
+};
 
 const DialogForm = composeComponent(
   withStyles(styles),

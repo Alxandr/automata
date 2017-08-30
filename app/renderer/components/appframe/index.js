@@ -4,9 +4,8 @@ import { withClasses, withStyles } from '@styles/styled';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { composeComponent } from '@renderer/utils';
-import { createStyleSheet } from 'material-ui/styles';
 
-const styles = createStyleSheet('AppFrame', theme => ({
+const styles = theme => ({
   '@global': {
     html: {
       boxSizing: 'border-box',
@@ -49,7 +48,7 @@ const styles = createStyleSheet('AppFrame', theme => ({
     minHeight: '100vh',
     width: '100%',
   },
-}));
+});
 
 const AppFrame = composeComponent(
   withStyles(styles),
@@ -59,10 +58,7 @@ const AppFrame = composeComponent(
     className: PropTypes.string,
     children: PropTypes.node.isRequired,
   }),
-  ({ className, children }) =>
-    <div className={className}>
-      {children}
-    </div>,
+  ({ className, children }) => <div className={className}>{children}</div>,
 );
 
 export default AppFrame;

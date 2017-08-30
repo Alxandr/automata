@@ -16,17 +16,16 @@ import { Select } from '@components/form';
 import Switch from 'material-ui/Switch';
 import { cancel } from '@shared/window';
 import { connect } from 'react-redux';
-import { createStyleSheet } from 'material-ui/styles';
 import { setDisplayName } from 'recompose';
 import { withStyles } from '@styles/styled';
 
-const styles = createStyleSheet('DlFactorioWindow', theme => ({
+const styles = theme => ({
   experimentalSwitch: {
     position: 'absolute',
     top: theme.spacing.unit,
     right: theme.spacing.unit,
   },
-}));
+});
 
 const versionsSelector = createSelector(onlineVersionsSelector, versions =>
   versions
@@ -67,7 +66,7 @@ const Window = composeComponent(
     toggleExperimental,
     invalid,
     submitting,
-  }) =>
+  }) => (
     <DialogForm onSubmit={handleSubmit}>
       <DialogTitle>Download version</DialogTitle>
       <DialogContent>
@@ -95,7 +94,8 @@ const Window = composeComponent(
           Download
         </Button>
       </DialogActions>
-    </DialogForm>,
+    </DialogForm>
+  ),
 );
 
 export default Window;

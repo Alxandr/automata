@@ -24,7 +24,6 @@ import React from 'react';
 import Text from 'material-ui/Typography';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { createStyleSheet } from 'material-ui/styles';
 import { withStyles } from '@styles/styled';
 
 const versionPropType = PropTypes.shape({
@@ -32,7 +31,7 @@ const versionPropType = PropTypes.shape({
   selected: PropTypes.bool.isRequired,
 });
 
-const styles = createStyleSheet('Versions', theme => ({
+const styles = theme => ({
   root: {
     display: 'flex',
   },
@@ -42,7 +41,7 @@ const styles = createStyleSheet('Versions', theme => ({
     right: theme.spacing.unit * 3,
     bottom: theme.spacing.unit * 3,
   },
-}));
+});
 
 const mapDispatchToVersionRowProps = (dispatch, { version: { name } }) => ({
   select: () => dispatch(select(name)),
@@ -54,7 +53,7 @@ const VersionRow = composeComponent(
   setPropTypes({
     version: versionPropType,
   }),
-  ({ version: { name, selected }, select }) =>
+  ({ version: { name, selected }, select }) => (
     <TableRow
       hover
       role="checkbox"
@@ -66,10 +65,9 @@ const VersionRow = composeComponent(
       <TableCell checkbox>
         <Checkbox checked={selected} />
       </TableCell>
-      <TableCell disablePadding>
-        {name}
-      </TableCell>
-    </TableRow>,
+      <TableCell disablePadding>{name}</TableCell>
+    </TableRow>
+  ),
 );
 
 const mapStateToShowVersionProps = createStructuredSelector({
@@ -99,9 +97,7 @@ const ShowVersions = composeComponent(
             <TableCell disablePadding>Version</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {rows}
-        </TableBody>
+        <TableBody>{rows}</TableBody>
       </Table>
     );
   },
@@ -125,9 +121,11 @@ const Versions = composeComponent(
     }
 
     const display =
-      local.length > 0
-        ? <ShowVersions versions={local} />
-        : <Text type="headline">No factorio versions installed.</Text>;
+      local.length > 0 ? (
+        <ShowVersions versions={local} />
+      ) : (
+        <Text type="headline">No factorio versions installed.</Text>
+      );
 
     return (
       <div className={classes.root}>

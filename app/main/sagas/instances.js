@@ -1,11 +1,16 @@
-import { CREATE_INSTANCE, FETCH_INSTANCES, START, setInstances } from '@shared/instances';
+import {
+  CREATE_INSTANCE,
+  FETCH_INSTANCES,
+  START,
+  setInstances,
+} from '@shared/instances';
 import { call, put, spawn, take, takeLatest } from 'redux-saga/effects';
 import { exists, link, numFiles, write } from '../fs';
 import { get, getAll, insert } from '../db';
-import { getAppDir, osName } from '../app';
 import { lock, unlock } from '@shared/window/actions';
 
 import { dialog } from 'electron';
+import { getAppDir } from '../app';
 import { getLocal as getLocalVersions } from './versions';
 import modal from './modal';
 import { join as pathJoin } from 'path';
@@ -13,18 +18,12 @@ import { slug } from '@shared/utils';
 import startGame from '../factorio/start';
 import { submitFilter } from '@shared/window/filters';
 
-const gameDirName = (() => {
-  switch (osName) {
-    case 'osx': return 'factorio.app';
-    case 'win': return 'factorio';
-    default: throw new Error('not implemented');
-  }
-})();
-
-const linkVersion = (versionPath, instanceDir) => link(pathJoin(instanceDir, gameDirName), versionPath);
+const linkVersion = (versionPath, instanceDir) =>
+  link(pathJoin(instanceDir, 'factorio'), versionPath);
 
 const msgBox = (() => {
-  const showMsgBox = opts => new Promise(resolve => dialog.showMessageBox(null, opts, resolve));
+  const showMsgBox = opts =>
+    new Promise(resolve => dialog.showMessageBox(null, opts, resolve));
 
   return opts => call(showMsgBox, opts);
 })();
@@ -47,12 +46,16 @@ function* newInstanceWindowSaga(id) {
 }
 
 function* showNewInstanceWindow(parent) {
-  const [ exit, result ] = yield call(modal, {
-    parent,
-    width: 500,
-    height: 245,
-    module: 'new_inst'
-  }, newInstanceWindowSaga);
+  const [exit, result] = yield call(
+    modal,
+    {
+      parent,
+      width: 500,
+      height: 245,
+      module: 'new_inst',
+    },
+    newInstanceWindowSaga,
+  );
 
   switch (exit) {
     case 'ok':
@@ -73,7 +76,8 @@ function* createInstance({ meta: { window } = {} }) {
       buttons: ['Ok'],
       defaultId: 0,
       title: 'No versions installed',
-      message: 'No factorio versions is installed. Please install one or more factorio versions before attempting to create instances.'
+      message:
+        'No factorio versions is installed. Please install one or more factorio versions before attempting to create instances.',
     });
 
     return;
@@ -99,8 +103,7 @@ function* createInstance({ meta: { window } = {} }) {
     // Step 3: Write config file
     const confPath = pathJoin(instanceDir, 'config.ini');
     const dataPath = pathJoin(instanceDir, 'data');
-    const conf =
-`
+    const conf = `
 ; version=2
 ; This is INI file: https://en.wikipedia.org/wiki/INI_file#Format
 ; Semicolons (;) at the beginning of the line indicate a comment. Comment lines are ignored.
@@ -117,7 +120,7 @@ write-data=${dataPath}
       dir: instanceDir,
       gameVersion: version.name,
       mods: [],
-      instanceVersion: null
+      instanceVersion: null,
     };
     yield call(insert, `instances/${slug}`, doc);
     yield call(fetchLocal);

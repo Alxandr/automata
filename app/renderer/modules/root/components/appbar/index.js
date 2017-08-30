@@ -13,10 +13,9 @@ import Toolbar from 'material-ui/Toolbar';
 import classNames from 'classnames';
 import { composeComponent } from '@renderer/utils';
 import { connect } from 'react-redux';
-import { createStyleSheet } from 'material-ui/styles';
 import { withStyles } from '@styles/styled';
 
-const styles = createStyleSheet('RootAppBar', () => ({
+const styles = {
   flex: {
     flex: 1,
   },
@@ -42,7 +41,7 @@ const styles = createStyleSheet('RootAppBar', () => ({
     width: 0,
     marginLeft: 0,
   },
-}));
+};
 
 const mapDispatchToNavItemProps = (dispatch, { tabs }) => ({
   onTabChange: (_, index) => {
@@ -82,9 +81,9 @@ const RootAppBar = composeComponent(
       index = 0;
     }
 
-    const tabComps = tabs.map(({ label }) =>
-      <Tab label={label} key={label} className={classes.tab} />,
-    );
+    const tabComps = tabs.map(({ label }) => (
+      <Tab label={label} key={label} className={classes.tab} />
+    ));
 
     return (
       <AppBar>
@@ -102,7 +101,7 @@ const RootAppBar = composeComponent(
             {title}
           </Text>
           <Tabs
-            index={index}
+            value={index}
             onChange={onTabChange}
             classes={{
               root: classes.tabs,

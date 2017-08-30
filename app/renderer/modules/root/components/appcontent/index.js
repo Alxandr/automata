@@ -4,9 +4,8 @@ import { withClasses, withStyles } from '@styles/styled';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { composeComponent } from '@renderer/utils';
-import { createStyleSheet } from 'material-ui/styles';
 
-const styles = createStyleSheet('AppContent', theme => ({
+const styles = theme => ({
   content: theme.mixins.gutters({
     paddingTop: 80,
     flex: '1 1 100%',
@@ -19,7 +18,7 @@ const styles = createStyleSheet('AppContent', theme => ({
       maxWidth: 900,
     },
   },
-}));
+});
 
 const AppContent = composeComponent(
   withStyles(styles),
@@ -29,10 +28,7 @@ const AppContent = composeComponent(
     children: PropTypes.node.isRequired,
     className: PropTypes.string,
   }),
-  ({ className, children }) =>
-    <div className={className}>
-      {children}
-    </div>,
+  ({ className, children }) => <div className={className}>{children}</div>,
 );
 
 export default AppContent;

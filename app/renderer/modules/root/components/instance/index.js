@@ -13,10 +13,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { createStyleSheet } from 'material-ui/styles';
 import { withStyles } from '@styles/styled';
 
-const styles = createStyleSheet('Instance', theme => ({
+const styles = theme => ({
   root: {
     display: 'flex',
   },
@@ -26,7 +25,7 @@ const styles = createStyleSheet('Instance', theme => ({
     right: theme.spacing.unit * 3,
     bottom: theme.spacing.unit * 3,
   },
-}));
+});
 
 const currentInstanceSelector = (state, props) =>
   instancesSelector(state).find(

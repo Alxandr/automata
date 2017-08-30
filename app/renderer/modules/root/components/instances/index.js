@@ -17,11 +17,10 @@ import React from 'react';
 import Text from 'material-ui/Typography';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { createStyleSheet } from 'material-ui/styles';
 import { push as routerPush } from '@shared/router';
 import { withStyles } from '@styles/styled';
 
-const styles = createStyleSheet('Instances', theme => ({
+const styles = theme => ({
   root: {
     display: 'flex',
   },
@@ -41,6 +40,7 @@ const styles = createStyleSheet('Instances', theme => ({
   cardMedia: {
     width: 200,
     height: 200,
+    position: 'relative',
   },
 
   overlay: {
@@ -85,7 +85,7 @@ const styles = createStyleSheet('Instances', theme => ({
     height: '100%',
     flexWrap: 'wrap',
   },
-}));
+});
 
 const instanceShape = {
   name: PropTypes.string.isRequired,
@@ -108,10 +108,12 @@ const Instance = composeComponent(
   withStyles(styles),
   setDisplayName('Instance'),
   setPropTypes(instanceShape),
-  ({ classes, name, icon, start, numSaves, mods, view }) =>
+  ({ classes, name, icon, start, numSaves, mods, view }) => (
     <Card className={classes.card} onClick={view}>
-      <CardMedia className={classes.cardMedia}>
-        <img src={icon || 'images/factorio.png'} />
+      <CardMedia
+        className={classes.cardMedia}
+        image={icon || 'images/factorio.png'}
+      >
         <div className={classes.overlay}>
           <IconButton onClick={start} className={classes.overlayButton}>
             <PlayArrowIcon className={classes.playIcon} />
@@ -122,14 +124,11 @@ const Instance = composeComponent(
         <Text type="headline" component="h2">
           {name}
         </Text>
-        <Text component="p">
-          Number of mods: {mods.length}
-        </Text>
-        <Text component="p">
-          Number of saves: {numSaves}
-        </Text>
+        <Text component="p">Number of mods: {mods.length}</Text>
+        <Text component="p">Number of saves: {numSaves}</Text>
       </CardContent>
-    </Card>,
+    </Card>
+  ),
 );
 
 const ShowInstances = composeComponent(
@@ -140,15 +139,11 @@ const ShowInstances = composeComponent(
       .isRequired,
   }),
   ({ instances, classes }) => {
-    const instanceCards = instances.map(inst =>
-      <Instance {...inst} key={inst._id} />,
-    );
+    const instanceCards = instances.map(inst => (
+      <Instance {...inst} key={inst._id} />
+    ));
 
-    return (
-      <div className={classes.instances}>
-        {instanceCards}
-      </div>
-    );
+    return <div className={classes.instances}>{instanceCards}</div>;
   },
 );
 
@@ -165,9 +160,11 @@ const Instances = composeComponent(
   setDisplayName('Instances'),
   ({ classes, local, createInstance }) => {
     const display =
-      local.length > 0
-        ? <ShowInstances instances={local} />
-        : <Text type="headline">No instances configured.</Text>;
+      local.length > 0 ? (
+        <ShowInstances instances={local} />
+      ) : (
+        <Text type="headline">No instances configured.</Text>
+      );
 
     return (
       <div className={classes.root}>
