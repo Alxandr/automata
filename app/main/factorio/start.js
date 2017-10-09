@@ -34,7 +34,7 @@ const start_osx = async dir => {
 };
 
 const start_win = async dir => {
-  const game = join(dir, 'factorio', 'bin', 'x64', 'factorio.exe');
+  const game = join(dir, 'factorio', 'factorio', 'bin', 'x64', 'factorio.exe');
   const conf = join(dir, 'config.ini');
   // const log = join(dir, 'log.txt');
 
